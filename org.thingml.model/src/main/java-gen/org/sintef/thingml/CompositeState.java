@@ -26,6 +26,7 @@ import org.eclipse.emf.common.util.EList;
  * The following features are supported:
  * <ul>
  *   <li>{@link org.sintef.thingml.CompositeState#getRegion <em>Region</em>}</li>
+ *   <li>{@link org.sintef.thingml.CompositeState#getTransitions <em>Transitions</em>}</li>
  * </ul>
  * </p>
  *
@@ -49,5 +50,21 @@ public interface CompositeState extends State, Region {
 	 * @generated
 	 */
 	EList<ParallelRegion> getRegion();
+
+	/**
+	 * Returns the value of the '<em><b>Transitions</b></em>' containment reference list.
+	 * The list contents are of type {@link org.sintef.thingml.Transitions}.
+	 * <!-- begin-user-doc -->
+	 * <p>
+	 * If the meaning of the '<em>Transitions</em>' containment reference list isn't clear,
+	 * there really should be more of a description here...
+	 * </p>
+	 * <!-- end-user-doc -->
+	 * @return the value of the '<em>Transitions</em>' containment reference list.
+	 * @see org.sintef.thingml.ThingmlPackage#getCompositeState_Transitions()
+	 * @model containment="true"
+	 * @generated
+	 */
+	EList<Transitions> getTransitions();
 
 } // CompositeState

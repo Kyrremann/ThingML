@@ -35,6 +35,7 @@ import org.sintef.thingml.ParallelRegion;
 import org.sintef.thingml.Region;
 import org.sintef.thingml.State;
 import org.sintef.thingml.ThingmlPackage;
+import org.sintef.thingml.Transitions;
 
 /**
  * <!-- begin-user-doc -->
@@ -47,6 +48,7 @@ import org.sintef.thingml.ThingmlPackage;
  *   <li>{@link org.sintef.thingml.impl.CompositeStateImpl#getInitial <em>Initial</em>}</li>
  *   <li>{@link org.sintef.thingml.impl.CompositeStateImpl#isHistory <em>History</em>}</li>
  *   <li>{@link org.sintef.thingml.impl.CompositeStateImpl#getRegion <em>Region</em>}</li>
+ *   <li>{@link org.sintef.thingml.impl.CompositeStateImpl#getTransitions <em>Transitions</em>}</li>
  * </ul>
  * </p>
  *
@@ -102,6 +104,16 @@ public class CompositeStateImpl extends StateImpl implements CompositeState {
 	 * @ordered
 	 */
 	protected EList<ParallelRegion> region;
+
+	/**
+	 * The cached value of the '{@link #getTransitions() <em>Transitions</em>}' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see #getTransitions()
+	 * @generated
+	 * @ordered
+	 */
+	protected EList<Transitions> transitions;
 
 	/**
 	 * <!-- begin-user-doc -->
@@ -210,6 +222,18 @@ public class CompositeStateImpl extends StateImpl implements CompositeState {
 	 * <!-- end-user-doc -->
 	 * @generated
 	 */
+	public EList<Transitions> getTransitions() {
+		if (transitions == null) {
+			transitions = new EObjectContainmentEList<Transitions>(Transitions.class, this, ThingmlPackage.COMPOSITE_STATE__TRANSITIONS);
+		}
+		return transitions;
+	}
+
+	/**
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 */
 	@Override
 	public NotificationChain eInverseRemove(InternalEObject otherEnd, int featureID, NotificationChain msgs) {
 		switch (featureID) {
@@ -217,6 +241,8 @@ public class CompositeStateImpl extends StateImpl implements CompositeState {
 				return ((InternalEList<?>)getSubstate()).basicRemove(otherEnd, msgs);
 			case ThingmlPackage.COMPOSITE_STATE__REGION:
 				return ((InternalEList<?>)getRegion()).basicRemove(otherEnd, msgs);
+			case ThingmlPackage.COMPOSITE_STATE__TRANSITIONS:
+				return ((InternalEList<?>)getTransitions()).basicRemove(otherEnd, msgs);
 		}
 		return super.eInverseRemove(otherEnd, featureID, msgs);
 	}
@@ -238,6 +264,8 @@ public class CompositeStateImpl extends StateImpl implements CompositeState {
 				return isHistory();
 			case ThingmlPackage.COMPOSITE_STATE__REGION:
 				return getRegion();
+			case ThingmlPackage.COMPOSITE_STATE__TRANSITIONS:
+				return getTransitions();
 		}
 		return super.eGet(featureID, resolve, coreType);
 	}
@@ -265,6 +293,10 @@ public class CompositeStateImpl extends StateImpl implements CompositeState {
 				getRegion().clear();
 				getRegion().addAll((Collection<? extends ParallelRegion>)newValue);
 				return;
+			case ThingmlPackage.COMPOSITE_STATE__TRANSITIONS:
+				getTransitions().clear();
+				getTransitions().addAll((Collection<? extends Transitions>)newValue);
+				return;
 		}
 		super.eSet(featureID, newValue);
 	}
@@ -289,6 +321,9 @@ public class CompositeStateImpl extends StateImpl implements CompositeState {
 			case ThingmlPackage.COMPOSITE_STATE__REGION:
 				getRegion().clear();
 				return;
+			case ThingmlPackage.COMPOSITE_STATE__TRANSITIONS:
+				getTransitions().clear();
+				return;
 		}
 		super.eUnset(featureID);
 	}
@@ -309,6 +344,8 @@ public class CompositeStateImpl extends StateImpl implements CompositeState {
 				return history != HISTORY_EDEFAULT;
 			case ThingmlPackage.COMPOSITE_STATE__REGION:
 				return region != null && !region.isEmpty();
+			case ThingmlPackage.COMPOSITE_STATE__TRANSITIONS:
+				return transitions != null && !transitions.isEmpty();
 		}
 		return super.eIsSet(featureID);
 	}

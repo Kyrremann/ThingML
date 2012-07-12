@@ -170,7 +170,7 @@ RULES {
 	 
 	PlatformAnnotation ::= !1 name[ANNOTATION] #1 value[STRING_LITERAL] ;
 	
-	StateMachine::= !1 "statechart" (#1 name[])? #1 "init" #1 initial[] ("keeps" #1 history[T_HISTORY])? (annotations)* #1 "{" ( !1 properties )* ( !1 "on" #1 "entry" #1 entry )? ( !1 "on" #1 "exit" #1 exit )?  ((!1 substate) | internal)* (!1 region)* !0 "}"  ;
+	StateMachine::= !1 "statechart" (#1 name[])? #1 "init" #1 initial[] ("keeps" #1 history[T_HISTORY])? (annotations)* #1 "{" ( !1 properties )* ( !1 "on" #1 "entry" #1 entry )? ( !1 "on" #1 "exit" #1 exit )?  ((!1 substate) | internal)* (!1 region)* !0 ( transitions )* "}"  ;
 	
 	State::= "state" #1 name[] (annotations)* #1 "{" ( !1 properties )* ( !1 "on" #1 "entry" entry )? ( !1 "on" "exit" exit )? ( outgoing | internal )* !0 "}"  ;
 	
@@ -179,6 +179,8 @@ RULES {
 	ParallelRegion ::= "region" #1 name[] #1 "init" #1 initial[] ("keeps" #1 history[T_HISTORY])? (annotations)* #1 "{"(!1 substate)* !0 "}"  ;
 	
 	Transition::= !1 "transition" (#1 name[])? #1 "->" #1 target[] (annotations)* ( !1 "event" #1 event )*  ( !1 "guard" #1 guard)? (!1 "action" #1 action)? (!1 "before" #1 before)? (!1 "after" #1 after)? ;
+
+	Transitions ::= !1 "transitions" ( #1 event ) "{" !1 (( #1 "(" guard ")" ) ( #1 name[] )? #1 "->" #1 target[] ( #1 "!" target[] )* ( !1 "action" #1 action )? (!1 "before" #1 before)? (!1 "after" #1 after)? )* !1 (( "(" guard ")" )? ( #1 name[] )? #1 "->" #1 target[] ( #1 "!" target[] )* ( !1 "action" #1 action )? (!1 "before" #1 before)? (!1 "after" #1 after)? )? "}" ( #1 "!" target[] )* ;
 
 	InternalTransition ::= !1 "internal" (#1 name[])? (annotations)* ( !1 "event" #1 event )*  ( !1 "guard" #1 guard)? (!1 "action" #1 action)?  ;
 

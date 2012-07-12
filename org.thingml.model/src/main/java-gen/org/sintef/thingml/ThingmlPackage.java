@@ -1104,13 +1104,22 @@ public interface ThingmlPackage extends EPackage {
 	int COMPOSITE_STATE__REGION = STATE_FEATURE_COUNT + 3;
 
 	/**
+	 * The feature id for the '<em><b>Transitions</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int COMPOSITE_STATE__TRANSITIONS = STATE_FEATURE_COUNT + 4;
+
+	/**
 	 * The number of structural features of the '<em>Composite State</em>' class.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
 	 * @generated
 	 * @ordered
 	 */
-	int COMPOSITE_STATE_FEATURE_COUNT = STATE_FEATURE_COUNT + 4;
+	int COMPOSITE_STATE_FEATURE_COUNT = STATE_FEATURE_COUNT + 5;
 
 	/**
 	 * The meta object id for the '{@link org.sintef.thingml.impl.StateMachineImpl <em>State Machine</em>}' class.
@@ -1229,6 +1238,15 @@ public interface ThingmlPackage extends EPackage {
 	 * @ordered
 	 */
 	int STATE_MACHINE__REGION = COMPOSITE_STATE__REGION;
+
+	/**
+	 * The feature id for the '<em><b>Transitions</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int STATE_MACHINE__TRANSITIONS = COMPOSITE_STATE__TRANSITIONS;
 
 	/**
 	 * The number of structural features of the '<em>State Machine</em>' class.
@@ -3757,6 +3775,98 @@ public interface ThingmlPackage extends EPackage {
 
 
 	/**
+	 * The meta object id for the '{@link org.sintef.thingml.impl.TransitionsImpl <em>Transitions</em>}' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @see org.sintef.thingml.impl.TransitionsImpl
+	 * @see org.sintef.thingml.impl.ThingmlPackageImpl#getTransitions()
+	 * @generated
+	 */
+	int TRANSITIONS = 78;
+
+	/**
+	 * The feature id for the '<em><b>Name</b></em>' attribute.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITIONS__NAME = HANDLER__NAME;
+
+	/**
+	 * The feature id for the '<em><b>Annotations</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITIONS__ANNOTATIONS = HANDLER__ANNOTATIONS;
+
+	/**
+	 * The feature id for the '<em><b>Event</b></em>' containment reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITIONS__EVENT = HANDLER__EVENT;
+
+	/**
+	 * The feature id for the '<em><b>Guard</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITIONS__GUARD = HANDLER__GUARD;
+
+	/**
+	 * The feature id for the '<em><b>Action</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITIONS__ACTION = HANDLER__ACTION;
+
+	/**
+	 * The feature id for the '<em><b>Target</b></em>' reference list.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITIONS__TARGET = HANDLER_FEATURE_COUNT + 0;
+
+	/**
+	 * The feature id for the '<em><b>After</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITIONS__AFTER = HANDLER_FEATURE_COUNT + 1;
+
+	/**
+	 * The feature id for the '<em><b>Before</b></em>' containment reference.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITIONS__BEFORE = HANDLER_FEATURE_COUNT + 2;
+
+	/**
+	 * The number of structural features of the '<em>Transitions</em>' class.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @generated
+	 * @ordered
+	 */
+	int TRANSITIONS_FEATURE_COUNT = HANDLER_FEATURE_COUNT + 3;
+
+
+	/**
 	 * Returns the meta object for class '{@link org.sintef.thingml.ThingMLModel <em>Thing ML Model</em>}'.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -4415,6 +4525,17 @@ public interface ThingmlPackage extends EPackage {
 	 * @generated
 	 */
 	EReference getCompositeState_Region();
+
+	/**
+	 * Returns the meta object for the containment reference list '{@link org.sintef.thingml.CompositeState#getTransitions <em>Transitions</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference list '<em>Transitions</em>'.
+	 * @see org.sintef.thingml.CompositeState#getTransitions()
+	 * @see #getCompositeState()
+	 * @generated
+	 */
+	EReference getCompositeState_Transitions();
 
 	/**
 	 * Returns the meta object for class '{@link org.sintef.thingml.Region <em>Region</em>}'.
@@ -5681,6 +5802,49 @@ public interface ThingmlPackage extends EPackage {
 	EAttribute getLocalVariable_Changeable();
 
 	/**
+	 * Returns the meta object for class '{@link org.sintef.thingml.Transitions <em>Transitions</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for class '<em>Transitions</em>'.
+	 * @see org.sintef.thingml.Transitions
+	 * @generated
+	 */
+	EClass getTransitions();
+
+	/**
+	 * Returns the meta object for the reference list '{@link org.sintef.thingml.Transitions#getTarget <em>Target</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the reference list '<em>Target</em>'.
+	 * @see org.sintef.thingml.Transitions#getTarget()
+	 * @see #getTransitions()
+	 * @generated
+	 */
+	EReference getTransitions_Target();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link org.sintef.thingml.Transitions#getAfter <em>After</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>After</em>'.
+	 * @see org.sintef.thingml.Transitions#getAfter()
+	 * @see #getTransitions()
+	 * @generated
+	 */
+	EReference getTransitions_After();
+
+	/**
+	 * Returns the meta object for the containment reference '{@link org.sintef.thingml.Transitions#getBefore <em>Before</em>}'.
+	 * <!-- begin-user-doc -->
+	 * <!-- end-user-doc -->
+	 * @return the meta object for the containment reference '<em>Before</em>'.
+	 * @see org.sintef.thingml.Transitions#getBefore()
+	 * @see #getTransitions()
+	 * @generated
+	 */
+	EReference getTransitions_Before();
+
+	/**
 	 * Returns the factory that creates the instances of the model.
 	 * <!-- begin-user-doc -->
 	 * <!-- end-user-doc -->
@@ -6241,6 +6405,14 @@ public interface ThingmlPackage extends EPackage {
 		 * @generated
 		 */
 		EReference COMPOSITE_STATE__REGION = eINSTANCE.getCompositeState_Region();
+
+		/**
+		 * The meta object literal for the '<em><b>Transitions</b></em>' containment reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference COMPOSITE_STATE__TRANSITIONS = eINSTANCE.getCompositeState_Transitions();
 
 		/**
 		 * The meta object literal for the '{@link org.sintef.thingml.impl.RegionImpl <em>Region</em>}' class.
@@ -7313,6 +7485,40 @@ public interface ThingmlPackage extends EPackage {
 		 * @generated
 		 */
 		EAttribute LOCAL_VARIABLE__CHANGEABLE = eINSTANCE.getLocalVariable_Changeable();
+
+		/**
+		 * The meta object literal for the '{@link org.sintef.thingml.impl.TransitionsImpl <em>Transitions</em>}' class.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @see org.sintef.thingml.impl.TransitionsImpl
+		 * @see org.sintef.thingml.impl.ThingmlPackageImpl#getTransitions()
+		 * @generated
+		 */
+		EClass TRANSITIONS = eINSTANCE.getTransitions();
+
+		/**
+		 * The meta object literal for the '<em><b>Target</b></em>' reference list feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TRANSITIONS__TARGET = eINSTANCE.getTransitions_Target();
+
+		/**
+		 * The meta object literal for the '<em><b>After</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TRANSITIONS__AFTER = eINSTANCE.getTransitions_After();
+
+		/**
+		 * The meta object literal for the '<em><b>Before</b></em>' containment reference feature.
+		 * <!-- begin-user-doc -->
+		 * <!-- end-user-doc -->
+		 * @generated
+		 */
+		EReference TRANSITIONS__BEFORE = eINSTANCE.getTransitions_Before();
 
 	}
 

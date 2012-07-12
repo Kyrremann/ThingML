@@ -84,6 +84,7 @@
     </genClasses>
     <genClasses ecoreClass="thingml.ecore#//CompositeState">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference thingml.ecore#//CompositeState/region"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference thingml.ecore#//CompositeState/transitions"/>
     </genClasses>
     <genClasses image="false" ecoreClass="thingml.ecore#//Region">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference thingml.ecore#//Region/substate"/>
@@ -238,6 +239,11 @@
     <genClasses ecoreClass="thingml.ecore#//LocalVariable">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference thingml.ecore#//LocalVariable/init"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute thingml.ecore#//LocalVariable/changeable"/>
+    </genClasses>
+    <genClasses ecoreClass="thingml.ecore#//Transitions">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference thingml.ecore#//Transitions/target"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference thingml.ecore#//Transitions/after"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference thingml.ecore#//Transitions/before"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

@@ -393,6 +393,10 @@ public class ThingmlAdapterFactory extends AdapterFactoryImpl {
 				return createLocalVariableAdapter();
 			}
 			@Override
+			public Adapter caseTransitions(Transitions object) {
+				return createTransitionsAdapter();
+			}
+			@Override
 			public Adapter defaultCase(EObject object) {
 				return createEObjectAdapter();
 			}
@@ -1501,6 +1505,20 @@ public class ThingmlAdapterFactory extends AdapterFactoryImpl {
 	 * @generated
 	 */
 	public Adapter createLocalVariableAdapter() {
+		return null;
+	}
+
+	/**
+	 * Creates a new adapter for an object of class '{@link org.sintef.thingml.Transitions <em>Transitions</em>}'.
+	 * <!-- begin-user-doc -->
+	 * This default implementation returns null so that we can easily ignore cases;
+	 * it's useful to ignore a case when inheritance will catch all the cases anyway.
+	 * <!-- end-user-doc -->
+	 * @return the new adapter.
+	 * @see org.sintef.thingml.Transitions
+	 * @generated
+	 */
+	public Adapter createTransitionsAdapter() {
 		return null;
 	}
 
