@@ -1,0 +1,27 @@
+====
+    Copyright (C) 2011 SINTEF <franck.fleurey@sintef.no>
+
+    Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 3, 29 June 2007;
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    	http://www.gnu.org/licenses/lgpl-3.0.txt
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+====
+
+The Rhino jar used by this library, js-14_Patch_716562.jar, is simply the
+standard js-14.jar, built with the patch for issue 716562.  This bug caused
+problems an infinite loop for some constructs for folks using Rhino with the
+"IDE mode" option enabled (which RSTALanguageSupport does).  For more
+information about the fix, see here:
+
+https://github.com/mozilla/rhino/commit/31236c9f05e231577f0eca8217b4965592636618
+
+Rather than use a nightly build, we decided to go with a patched version of
+1.7R3, since it would theoretically be more stable.  Whenever a new stable
+build of Rhino materializes (1.8?), this library will be upgraded to use that.

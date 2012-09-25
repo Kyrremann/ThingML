@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+
+    Copyright (C) 2011 SINTEF <franck.fleurey@sintef.no>
+
+    Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 3, 29 June 2007;
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    	http://www.gnu.org/licenses/lgpl-3.0.txt
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+
+<!-- 
+
+	This is the Ant build script for the RSyntaxTextArea language support jar.
+	You can build a jar that adds support to RSTA for any combination of the
+	following languages:
+	
+		- C
+		- Groovy
+		- HTML
+		- Java
+		- JavaScript
+		- JSP
+		- Perl
+		- PHP
+		- Unix Shell
+		- ThingML
+		- XML
+	
+	Available targets include:
+	
+		1. compile:         Compiles all org.fife classes into ${class-dir}.
+		2. make-jar:        Creates the jar file.
+
+	Note that to build this project, you will need the two sister projects
+	"RSyntaxTextArea" and "AutoComplete" checked out along-side this one.
+
+	Author:   Robert Futrell
+	Version:  0.8.0
+	Date:     02/19/2012
+
+-->
+<project name="LanguageSupport" default="make-jar" basedir=".">
+
+  <description>LanguageSupport build file</description>
+
+
+  <!-- These properties control what languages get added to the built -->
+  <!-- Simply remove the properties for languages you don't need.     -->
+  <!-- You will have to modify LanguageSupportFactory.java though.    -->
+  <property name="thingml"          value="true"/>
+
+  <!-- If this property is set, then the demos for all of  -->
+  <!-- the supported languages will be added to the built  -->
+  <!-- jar.  Comment this out if you don't need them.      -->
+  <property name="demo"             value="true"/>
+
+  <!-- Set global properties for this build.         -->
+  <!-- You generally shouldn't have to change these. -->
+  <property name="version"          value="0.8.0"/>
+  <property name="source-dir"       location="src"/>
+  <property name="class-dir"        location="ant-classes"/>
+  <property name="dist-dir"         location="dist"/>
+  <property name="doc-dir"          location="javadoc"/>
+  <property name="debug"            value="false"/>
+  <property name="debuglevel"       value="lines,var,source"/>
+  <property name="java-level"       value="1.4"/>
+  <property name="autocomplete-jar" location="../AutoComplete/trunk/dist/autocomplete.jar"/>
+  <property name="rsta-jar"         location="../RSyntaxTextArea/trunk/dist/rsyntaxtextarea.jar"/>
+  <property name="java-cup"         location="lib/java-cup-11a.jar"/>
+
+
+  <!-- Compiles the classes.  -->
+  <target name="compile" description="Compile the source">
+    <delete includeEmptyDirs="true" quiet="true" dir="${class-dir}"/>
+    <mkdir dir="${class-dir}"/>
+    <javac destdir="${class-dir}" srcdir="${source-dir}" sourcepath=""
+	   deprecation="yes" debug="${debug}" debuglevel="${debuglevel}"
+	   source="${java-level}" target="${java-level}">
+
+      <classpath>
+	<pathelement     location="${rsta-jar}"/>
+	<pathelement     location="${autocomplete-jar}"/>
+	<pathelement	 location="lib/java-cup-11a.jar"/>
+	<path            location="../../ThingML/org.thingml.compilers/target/classes/*"/>
+	<path            location="../../ThingML/org.thingml.compilers/target/test-classes/*"/>
+      </classpath>
+      
+      <include                  name="org/fife/rsta/ac/*"/>
+      <include                  name="org/fife/rsta/ac/common/*"/>
+
+      <include if="thingml"	name="org/fife/rsta/ac/thingml/**"/>
+      <include if="demo"        name="org/fife/rsta/ac/demo/**"/>
+
+    </javac>
+  </target>
+
+
+  <!-- Creates the jar file. -->
+  <target name="make-jar" depends="compile" description="Create the jar file">
+
+    <delete includeEmptyDirs="true" quiet="true" dir="${dist-dir}"/>
+    <mkdir dir="${dist-dir}"/>
+
+    <jar destfile="${dist-dir}/language_support.jar">
+      <fileset dir="${class-dir}"/>
+      <fileset dir=".">
+	<include if="thingml"   name="data/thingml.xml"/>
+      </fileset>
+      <fileset dir="src">
+    	<include if="thingml" name="org/fife/rsta/ac/thingml/**/*.png"/>
+      </fileset>
+    <fileset dir="res">
+    	<include if="demo" name="**"/>
+      </fileset>
+      <manifest>
+	<attribute name="Main-Class" value="org.fife.rsta.ac.demo.DemoApp"/>
+	<attribute name="Class-Path" value="rsyntaxtextarea.jar autocomplete.jar js-14_Patch_716562.jar java-cup-11a.jar"/>
+	<attribute name="Specification-Title" value="RSyntaxTextArea Language Support"/>
+	<attribute name="Specification-Version" value="${version}"/>
+	<attribute name="Implementation-Title" value="org.fife.ui"/>
+	<attribute name="Implementation-Version" value="${version}"/>
+      </manifest>
+    </jar>
+
+    <!-- Copy dependencies and extra stuff. -->
+    <copy todir="${dist-dir}" file="${rsta-jar}"/>
+    <copy todir="${dist-dir}" file="${autocomplete-jar}"/>
+    <copy todir="${dist-dir}" file="${java-cup}"/>
+    <copy todir="${dist-dir}">
+      <fileset dir="${basedir}">
+	<include name="RSTALanguageSupport.License.txt"/>
+	<include name="readme.txt"/>
+      </fileset>
+    </copy>
+  </target>
+</project>

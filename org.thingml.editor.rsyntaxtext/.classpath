@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
+	<classpathentry kind="lib" path="/home/kyrremann/workspace/RSyntaxTextarea/RSyntaxTextArea/trunk/dist/rsyntaxtextarea.jar" sourcepath="/home/kyrremann/workspace/ThingML-Editor/RSyntaxTextArea"/>
+	<classpathentry kind="lib" path="/home/kyrremann/workspace/RSyntaxTextarea/ThingMLDemo/lib/java-cup-11a.jar"/>
+	<classpathentry kind="lib" path="/home/kyrremann/workspace/ThingML-Editor/AutoComplete/trunk/dist/autocomplete.jar"/>
+	<classpathentry kind="lib" path="/home/kyrremann/workspace/ThingML-Editor/ThingMLDemo/dist/language_support.jar"/>
+	<classpathentry kind="src" path="/org.thingml.compilers"/>
+	<classpathentry kind="lib" path="/home/kyrremann/workspace/ThingML/org.thingml.compilers/target/classes"/>
+	<classpathentry kind="lib" path="/home/kyrremann/workspace/ThingML/org.thingml.model/target/classes"/>
+	<classpathentry kind="lib" path="/home/kyrremann/workspace/ThingML/org.emftext.commons.antlr3_3_0/target/classes"/>
+	<classpathentry kind="lib" path="/home/kyrremann/.m2/repository/org/kevoree/extra/org.kevoree.extra.emf.library/2.7.0/org.kevoree.extra.emf.library-2.7.0.jar">
+		<attributes>
+			<attribute name="maven.pomderived" value="true"/>
+			<attribute name="maven.groupId" value="org.kevoree.extra"/>
+			<attribute name="maven.artifactId" value="org.kevoree.extra.emf.library"/>
+			<attribute name="maven.version" value="2.7.0"/>
+			<attribute name="maven.scope" value="compile"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/3"/>
+	<classpathentry kind="lib" path="/home/kyrremann/.m2/repository/org/thingml/org.thingml.compilers/0.6.0-SNAPSHOT/org.thingml.compilers-0.6.0-20120904.152040-281.jar"/>
+	<classpathentry kind="lib" path="/home/kyrremann/.m2/repository/org/thingml/org.thingml.model/0.6.0-SNAPSHOT/org.thingml.model-0.6.0-20120904.152043-280.jar"/>
+	<classpathentry kind="lib" path="/home/kyrremann/.m2/repository/org/thingml/org.thingml.parser.standalone/0.6.0-SNAPSHOT/org.thingml.parser.standalone-0.6.0-20120904.152045-280.jar"/>
+	<classpathentry kind="lib" path="/home/kyrremann/.m2/repository/org/thingml/org.thingml.utils/0.6.0-SNAPSHOT/org.thingml.utils-0.6.0-20120904.152048-148.jar"/>
+	<classpathentry kind="lib" path="/home/kyrremann/.m2/repository/org/emftext/org.emftext.commons.antlr/3.3.0/org.emftext.commons.antlr-3.3.0.jar"/>
+	<classpathentry kind="output" path="bin"/>
+	<referencedentry kind="lib" path="/home/kyrremann/workspace/RSyntaxTextarea/RSTALanguageSupport/dist/autocomplete.jar" sourcepath="/home/kyrremann/workspace/RSyntaxTextarea/AutoComplete/src"/>
+</classpath>

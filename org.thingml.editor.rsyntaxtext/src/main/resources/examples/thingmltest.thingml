@@ -1,0 +1,27 @@
+import "../../hardware/bricks/led.thingml"
+ 
+thing blink includes TimerMsgs, LedMsgs {
+ 
+    required port com {
+ 
+        receives timer_timeout
+        sends timer_start, timer_cancel, led_on, led_off, led_toggle
+ 
+        }
+ 
+        statechart blinkImpl init start {
+ 
+            state start {
+ 
+                on entry do
+                com!led_toggle ()
+                com!timer_start (500)
+                end
+ 
+                transition->start
+                event com?timer_timeout
+ 
+                }
+            }
+ 
+    }
