@@ -121,7 +121,7 @@ class ThingMLPanel extends JPanel {
         // println("cfilechooser.getSelectedFile = " + filechooser.getSelectedFile);
 
         try {
-//            val folder = filechooser.getSelectedFile.toString
+	//    val folder = filechooser.getSelectedFile.toString
 
           // Load the model
           val thingmlModel = loadThingMLmodel(targetFile.get)

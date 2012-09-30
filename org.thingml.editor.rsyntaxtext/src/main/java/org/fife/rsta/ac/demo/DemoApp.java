@@ -27,10 +27,17 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+import org.fife.ui.rsyntaxtextarea.modes.ThingMLTokenMaker;
 import org.sintef.thingml.Configuration;
 import org.sintef.thingml.ThingMLModel;
+import org.sintef.thingml.ThingmlPackage;
+import org.sintef.thingml.resource.thingml.IThingmlTextToken;
+import org.sintef.thingml.resource.thingml.mopp.ThingmlAntlrScanner;
+import org.sintef.thingml.resource.thingml.mopp.ThingmlLexer;
+import org.sintef.thingml.resource.thingml.mopp.ThingmlResourceFactory;
+import org.sintef.thingml.resource.thingml.mopp.ThingmlTextToken;
 import org.thingml.cgenerator.CGenerator;
-// import org.thingml.graphexport.test.StandaloneParserTestLoadFile;
+//import org.thingml.graphexport.test.StandaloneParserTestLoadFile;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EPackage;
@@ -54,17 +61,6 @@ public class DemoApp extends JFrame {
 		setTitle("RSTA Language Support ThingML Demo Application");
 		setRootPane(new DemoRootPane());
 
-		//		StandaloneParserTestLoadFile file = new StandaloneParserTestLoadFile("/home/kyrremann/workspace/ThingML-Editor/ThingMLDemo/res/examples/thingmltest.thingml");
-		//		file.runTest();
-		// System.out.println(file);
-		
-		// GraphicsEnvironment env = GraphicsEnvironment
-		// .getLocalGraphicsEnvironment();
-		// GraphicsDevice dev = env.getDefaultScreenDevice();
-		// setResizable(true);
-		// setUndecorated(true);
-		// dev.setFullScreenWindow(this);
-		
 		pack();
 	}
 
@@ -83,24 +79,32 @@ public class DemoApp extends JFrame {
 	}
 
 	public static void main(String[] args) {
-		SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
-				try {
-					UIManager.setLookAndFeel(UIManager
-							.getSystemLookAndFeelClassName());
-					// UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-				} catch (Exception e) {
-					e.printStackTrace(); // Never happens
-				}
-				Toolkit.getDefaultToolkit().setDynamicLayout(true);
-				try {
-					new DemoApp().setVisible(true);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		});
+
+		// Testing out EclipseMF and ThingML
+		System.out.println("Trying to initial ThingML code");
+		ThingMLTesting test = new ThingMLTesting();
+		// test.testCodeGeneration();
+		test.testParsing();
+		System.out.println("All done, doing other stuff from now on...");
+
+//		SwingUtilities.invokeLater(new Runnable() {
+//			public void run() {
+//				try {
+//					UIManager.setLookAndFeel(UIManager
+//							.getSystemLookAndFeelClassName());
+//					// UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+//				} catch (Exception e) {
+//					e.printStackTrace(); // Never happens
+//				}
+//				Toolkit.getDefaultToolkit().setDynamicLayout(true);
+//				try {
+//					new DemoApp().setVisible(true);
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//			}
+//		});
 	}
 
 }

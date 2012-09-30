@@ -83,6 +83,7 @@ public class StandaloneParserTestLoadFile extends TestCase {
         ResourceSet rs = new ResourceSetImpl();
         URI xmiuri = URI.createFileURI(model_path);
         Resource model = rs.createResource(xmiuri);
+	System.out.println("\n\n"+model+"\n\n");
         model.load(null);
         //org.eclipse.emf.ecore.util.EcoreUtil.resolveAll(rs);
 
@@ -122,6 +123,7 @@ public class StandaloneParserTestLoadFile extends TestCase {
         }
 
         try {
+	    System.out.println("\n\nTest Arduino\n\n");
             Map<Configuration, String> ccode = CGenerator.compileAllArduinoJava((ThingMLModel) model.getContents().get(0));
             for (Configuration t : ccode.keySet()) {
                 System.out.println(" -> Writing file " + t.getName() + ".pde");
