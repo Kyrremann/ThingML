@@ -317,11 +317,18 @@ URL						= (((https?|f(tp|ile))"://"|"www.")({URLCharacters}{URLEndCharacter})?)
 <YYINITIAL> {
 
 	/* Keywords */
-	"final"							|
-	"init"							{ addToken(Token.RESERVED_WORD); }
+	"import"                        |
+	"required"                      |
+    "sends"                         |
+    "receives"                      |
+    "final"							|
+    "init"							{ addToken(Token.RESERVED_WORD); }
 
-	"StateMachine"          		|
-    "State" 						{ addToken(Token.FUNCTION); }
+    "event"                         |
+    "action"                        |
+    "transition"                    |
+	"statechart"              		|
+	"state" 						{ addToken(Token.FUNCTION); }
 
 	{LineTerminator}				{ addNullToken(); return firstToken; }
 

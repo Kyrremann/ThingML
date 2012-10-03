@@ -209,8 +209,10 @@ class ThingMLPanel extends JPanel {
           return
         try {
           val thingmlModel = loadThingMLmodel(targetFile.get)
-          SwingGenerator.compileAndRun(thingmlModel)                                                                      
-          
+	  thingmlModel.allConfigurations.foreach{c =>
+          SwingGenerator.compileAndRun(c, thingmlModel)                                                                      
+          }
+
         }
         catch {
           case t : Throwable => t.printStackTrace()
@@ -356,6 +358,8 @@ class ThingMLPanel extends JPanel {
           resource = new ThingmlResource(URI.createFileURI(targetFile.get.getAbsolutePath))
         }
         else resource = new ThingmlResource(URI.createURI("http://thingml.org"))
+
+	System.out.println(targetFile.get.getAbsolutePath);
 
         // It does not really work without a resourceSet
         val rset = new ResourceSetImpl()

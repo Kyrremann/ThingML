@@ -88,7 +88,8 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 		TokenMakerFactory.setDefaultInstance(atmf);
 
 		textArea = createTextArea();
-		setText("ThingMLExample.txt", SYNTAX_STYLE_THINGML);
+		// setText("ThingMLExample.txt", SYNTAX_STYLE_THINGML);
+		setText("blink.thingml", SYNTAX_STYLE_THINGML);
 		scrollPane = new RTextScrollPane(textArea, true);
 		scrollPane.setIconRowHeaderEnabled(true);
 		scrollPane.getGutter().setBookmarkingEnabled(true);
@@ -350,7 +351,7 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 
 		ClassLoader cl = getClass().getClassLoader();
 		BufferedReader r = null;
-		try {
+		try { // TODO: Removed examples/ + resources
 			r = new BufferedReader(new InputStreamReader(
 					cl.getResourceAsStream("examples/" + resource), "UTF-8"));
 			textArea.read(r, null);

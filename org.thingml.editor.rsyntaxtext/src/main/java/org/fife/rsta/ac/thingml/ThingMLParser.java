@@ -15,9 +15,15 @@
  */
 package org.fife.rsta.ac.thingml;
 
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.fife.rsta.ac.thingml.syntaxtree.Program;
 import org.fife.rsta.ac.thingml.thingmlparser.Lexer;
 import org.fife.rsta.ac.thingml.thingmlparser.parser;
+import org.fife.rsta.ac.thingml.tree.ThingMLTree;
 import org.fife.rsta.ac.thingml.tree.ThingMLTreeNode;
 import org.fife.ui.rsyntaxtextarea.RSyntaxDocument;
 import org.fife.ui.rsyntaxtextarea.parser.AbstractParser;
@@ -25,12 +31,21 @@ import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice;
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.ParserNotice;
+import org.sintef.thingml.resource.thingml.IThingmlTextDiagnostic;
+import org.sintef.thingml.resource.thingml.IThingmlTextToken;
+import org.sintef.thingml.resource.thingml.mopp.ThingmlAntlrScanner;
+import org.sintef.thingml.resource.thingml.mopp.ThingmlLexer;
+import org.sintef.thingml.resource.thingml.mopp.ThingmlResource;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.List;
+
+import javax.swing.text.BadLocationException;
 
 /**
  * Parses ThingML code in an <code>RSyntaxTextArea</code>.
@@ -87,30 +102,47 @@ public class ThingMLParser extends AbstractParser {
 
 	public ParseResult parse(RSyntaxDocument document, String arg1) {
 		DefaultParseResult result = new DefaultParseResult(this);
-		int lineCount = document.getDefaultRootElement().getElementCount();
-		result.setParsedLines(0, lineCount - 1);
-
-		parser parser = null;
-		Program program;
-		InputStream inputStream = null;
+		ThingmlResource resource = null;
+		// Program program;
 		long start = 0;
 
 		try {
+			start = System.currentTimeMillis();
+			resource = new ThingmlResource(URI.createURI("http://thingml.org"));
+			ResourceSetImpl resourceSetImpl = new ResourceSetImpl();
+			resourceSetImpl.getResources().add(resource);
+			InputStream inputStream;
+
 			inputStream = new ByteArrayInputStream(document.getText(0,
 					document.getLength()).getBytes());
-			start = System.currentTimeMillis();
-			Lexer lexer = new Lexer(inputStream);
-			lineOffset = lexer.getLineOffset();
-			parser = new parser(lexer);
-			program = (Program) parser.parse().value;
+			resource.load(inputStream, null);
+
+			if (!resource.getErrors().isEmpty())
+				throw new ParseException("", -1);
+
 			long time = System.currentTimeMillis() - start;
+			System.out.println("TIME: " + time);
 			result.setParseTime(time);
-			root = program.createAst();
-		} catch (Exception e) {
+			// root = createAst(document);
+			ThingMLTree tree = new ThingMLTree(resource.getAllContents());
+			root = tree.getRoot();
+			System.out.println();
+			int lineCount = document.getDefaultRootElement().getElementCount();
+			result.setParsedLines(0, lineCount - 1);
+		} catch (BadLocationException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ParseException e) {
+			IThingmlTextDiagnostic diagnostic = (IThingmlTextDiagnostic) resource
+					.getErrors().get(0);
+			int offset = getIndex(document, diagnostic.getLine(),
+					diagnostic.getColumn());
 			DefaultParserNotice notice = new DefaultParserNotice(this,
-					parser.errorValue, parser.errorLine,
-					getLineOffset(parser.errorLine) + parser.errorColumn,
-					parser.errorValue.length());
+					diagnostic.getMessage(), diagnostic.getLine(), offset,
+					getLength(diagnostic.getMessage()));
 			notice.setLevel(ParserNotice.ERROR);
 			result.addNotice(notice);
 			// result.setError(e);
@@ -121,11 +153,27 @@ public class ThingMLParser extends AbstractParser {
 		return result;
 	}
 
-	public int getLineOffset(int line) {
-		System.out.println("Size is " + lineOffset.size() + ", asks for " + line);
-		if (line < 1)
-			return 0;
-		return ((Integer) lineOffset.get(line - 1)).intValue() + line;
+	private ThingMLTreeNode createAst(RSyntaxDocument document)
+			throws BadLocationException {
+		ThingmlLexer lexer = new ThingmlLexer();
+		ThingmlAntlrScanner scanner = new ThingmlAntlrScanner(lexer);
+		scanner.setText(document.getText(0, document.getLength()));
+		IThingmlTextToken token = scanner.getNextToken();
+		while (token != null) {
+
+			token = scanner.getNextToken();
+		}
+		return new ThingMLTreeNode("ROOT");
 	}
 
+	public int getIndex(RSyntaxDocument doc, int line, int column) {
+		int lineStart = doc.getDefaultRootElement().getElement(line - 1)
+				.getStartOffset();
+		return lineStart + column;
+	}
+
+	public int getLength(String message) {
+		// TODO: Not a proper way to find the length
+		return message.split("\"")[1].split(" ")[0].length();
+	}
 }

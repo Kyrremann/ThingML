@@ -36,6 +36,12 @@ public class ThingMLTreeNode extends SourceTreeNode {
 		this.name = name;
 	}
 	
+	public ThingMLTreeNode(String name, int offset) {
+		super(name);
+		this.name = name;
+		this.offset = offset;
+	}
+	
 	public String toString() {
 		return name;
 	}

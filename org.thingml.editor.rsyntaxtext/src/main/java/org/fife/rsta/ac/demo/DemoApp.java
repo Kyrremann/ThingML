@@ -60,7 +60,7 @@ public class DemoApp extends JFrame {
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setTitle("RSTA Language Support ThingML Demo Application");
 		setRootPane(new DemoRootPane());
-
+		
 		pack();
 	}
 
@@ -79,32 +79,24 @@ public class DemoApp extends JFrame {
 	}
 
 	public static void main(String[] args) {
-
-		// Testing out EclipseMF and ThingML
-		System.out.println("Trying to initial ThingML code");
-		ThingMLTesting test = new ThingMLTesting();
-		// test.testCodeGeneration();
-		test.testParsing();
-		System.out.println("All done, doing other stuff from now on...");
-
-//		SwingUtilities.invokeLater(new Runnable() {
-//			public void run() {
-//				try {
-//					UIManager.setLookAndFeel(UIManager
-//							.getSystemLookAndFeelClassName());
-//					// UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
-//				} catch (Exception e) {
-//					e.printStackTrace(); // Never happens
-//				}
-//				Toolkit.getDefaultToolkit().setDynamicLayout(true);
-//				try {
-//					new DemoApp().setVisible(true);
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
-//			}
-//		});
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					UIManager.setLookAndFeel(UIManager
+							.getSystemLookAndFeelClassName());
+					// UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+				} catch (Exception e) {
+					e.printStackTrace(); // Never happens
+				}
+				Toolkit.getDefaultToolkit().setDynamicLayout(true);
+				try {
+					new DemoApp().setVisible(true);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 }
