@@ -75,9 +75,7 @@ public class ThingMLOutlineTree extends AbstractSourceTree {
 			ThingMLTreeNode node = (ThingMLTreeNode) lastNode;
 			int len = node.getLength();
 			if (len > -1) { // Should always be true
-				int offs = node.getOffset();
-				int line = node.getLine();
-				textArea.select(offs, offs + len);
+				textArea.select(node.getCharStart(), node.getCharEnd() + 1);
 			}
 		}
 	}

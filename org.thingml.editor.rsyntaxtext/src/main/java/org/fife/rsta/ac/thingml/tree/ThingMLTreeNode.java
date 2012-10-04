@@ -24,53 +24,92 @@ public class ThingMLTreeNode extends SourceTreeNode {
 	private static final long serialVersionUID = -8551575054471449261L;
 	private String name;
 	private Icon icon;
-	private int offset;
-	private int line;
-    /**
-     * only to be used if you ever need to know where the weight is place...
-     */
-    public int weightOffset;
+	private int line, column, charStart, charEnd;
 	
 	public ThingMLTreeNode(String name) {
 		super(name);
-		this.name = name;
+		this.setName(name);
 	}
 	
 	public ThingMLTreeNode(String name, int offset) {
 		super(name);
-		this.name = name;
-		this.offset = offset;
+		this.setName(name);
 	}
-	
-	public String toString() {
+
+	public String getName() {
 		return name;
-	}
-	
-	public int getLength() {
-		return name.length();
 	}
 
 	public Icon getIcon() {
 		return icon;
 	}
-	
-	public int getOffset() {
-		return offset;
-	}
-	
+
 	public int getLine() {
 		return line;
 	}
+
+	/**
+	 * Where on the current line the word starts
+	 * @return the column
+	 */
+	public int getColumn() {
+		return column;
+	}
+
+	/**
+	 * Where the word start based on the whole text
+	 * @return the charStart
+	 */
+	public int getCharStart() {
+		return charStart;
+	}
+
+	/**
+	 * Where the word ends based on the whole text
+	 * @see getCharStart() 
+	 * @return the charEnd
+	 */
+	public int getCharEnd() {
+		return charEnd;
+	}
 	
+	/**
+	 * @return the length of the name
+	 */
+	public int getLength() {
+		return name.length();
+	}
+
+	/**
+	 * @param charEnd the charEnd to set
+	 */
+	public void setCharEnd(int charEnd) {
+		this.charEnd = charEnd;
+	}
+
+	/**
+	 * @param charStart the charStart to set
+	 */
+	public void setCharStart(int charStart) {
+		this.charStart = charStart;
+	}
+
+	/**
+	 * @param column the column to set
+	 */
+	public void setColumn(int column) {
+		this.column = column;
+	}
+
 	public void setLine(int line) {
 		this.line = line;
 	}
 
-	public void setOffset(int offset) {
-		this.offset = offset;
-	}
-
 	public void setIcon(Icon icon) {
 		this.icon = icon;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 }

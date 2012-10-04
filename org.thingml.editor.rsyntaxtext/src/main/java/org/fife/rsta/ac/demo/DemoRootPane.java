@@ -115,7 +115,7 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 				JSplitPane.HORIZONTAL_SPLIT, treeSP, scrollPane);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				mainSplitPane.setDividerLocation(150);
+				mainSplitPane.setDividerLocation(350); // TODO: 150
 			}
 		});
 		mainSplitPane.setContinuousLayout(true);

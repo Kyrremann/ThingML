@@ -22,21 +22,21 @@
     <keywords>
 
         <keyword
-            name="StateMachine"
+            name="statechart"
             definedIn="ThingML v1.0"
-            type="State machine" >
+            type="State chart" >
 
             <desc>
-Defines a Statechart.
+Defines a statechart.
             </desc>
         </keyword>
 
         <keyword
-            name="State"
-            type="State" >
+            name="state"
+            type="state" >
 
             <desc>
-Defines a state inside a StateMachine
+Defines a state inside a statechart
             </desc>
         </keyword>
     </keywords>

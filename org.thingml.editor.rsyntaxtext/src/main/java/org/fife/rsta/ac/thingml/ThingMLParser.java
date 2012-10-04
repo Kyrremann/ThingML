@@ -121,10 +121,9 @@ public class ThingMLParser extends AbstractParser {
 				throw new ParseException("", -1);
 
 			long time = System.currentTimeMillis() - start;
-			System.out.println("TIME: " + time);
 			result.setParseTime(time);
 			// root = createAst(document);
-			ThingMLTree tree = new ThingMLTree(resource.getAllContents());
+			ThingMLTree tree = new ThingMLTree(resource);
 			root = tree.getRoot();
 			System.out.println();
 			int lineCount = document.getDefaultRootElement().getElementCount();
