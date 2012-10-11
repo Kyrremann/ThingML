@@ -20,6 +20,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -39,9 +40,9 @@ interface Actions {
 	static class AboutAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
-		private DemoRootPane demo;
+		private JRootPane demo;
 
-		public AboutAction(DemoRootPane demo) {
+		public AboutAction(JRootPane demo) {
 			this.demo = demo;
 			putValue(NAME, "About RSTALanguageSupport...");
 		}
@@ -80,10 +81,10 @@ interface Actions {
 
 		private static final long serialVersionUID = 1L;
 
-		private DemoRootPane demo;
+		private JRootPane demo;
 		private JFileChooser chooser;
 
-		public OpenAction(DemoRootPane demo, ImageIcon icon) {
+		public OpenAction(JRootPane demo, ImageIcon icon) {
 			super(null, icon);
 			this.demo = demo;
 			if (icon == null)
@@ -102,7 +103,7 @@ interface Actions {
 			}
 			int rc = chooser.showOpenDialog(demo);
 			if (rc == JFileChooser.APPROVE_OPTION) {
-				demo.openFile(chooser.getSelectedFile());
+				// demo.openFile(chooser.getSelectedFile());
 			}
 		}
 
@@ -115,10 +116,10 @@ interface Actions {
 
 		private static final long serialVersionUID = 1L;
 
-		private DemoRootPane demo;
+		private JRootPane demo;
 		private JFileChooser chooser;
 
-		public NewFileAction(DemoRootPane demo, ImageIcon icon) {
+		public NewFileAction(JRootPane demo, ImageIcon icon) {
 			super(null, icon);
 			this.demo = demo;
 			if (icon == null)
@@ -137,7 +138,7 @@ interface Actions {
 			}
 			int rc = chooser.showOpenDialog(demo);
 			if (rc == JFileChooser.APPROVE_OPTION) {
-				demo.openFile(chooser.getSelectedFile());
+				// TODO demo.openFile(chooser.getSelectedFile());
 			}
 		}
 
@@ -150,10 +151,10 @@ interface Actions {
 
 		private static final long serialVersionUID = 1L;
 
-		private DemoRootPane demo;
+		private JRootPane demo;
 		private JFileChooser chooser;
 
-		public SaveAction(DemoRootPane demo, ImageIcon icon) {
+		public SaveAction(JRootPane demo, ImageIcon icon) {
 			super(null, icon);
 			this.demo = demo;
 			if (icon == null)
@@ -196,9 +197,9 @@ interface Actions {
 		 */
 		private static final long serialVersionUID = 1L;
 		private LookAndFeelInfo info;
-		private DemoRootPane demo;
+		private JRootPane demo;
 
-		public LookAndFeelAction(DemoRootPane demo, LookAndFeelInfo info) {
+		public LookAndFeelAction(JRootPane demo, LookAndFeelInfo info) {
 			putValue(NAME, info.getName());
 			this.demo = demo;
 			this.info = info;
@@ -243,5 +244,7 @@ interface Actions {
 		}
 
 	}
+	
+	
 
 }

@@ -4,7 +4,7 @@
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="lib" path="/home/kyrremann/workspace/RSyntaxTextarea/RSyntaxTextArea/trunk/dist/rsyntaxtextarea.jar" sourcepath="/home/kyrremann/workspace/ThingML-Editor/RSyntaxTextArea"/>
 	<classpathentry kind="lib" path="/home/kyrremann/workspace/RSyntaxTextarea/ThingMLDemo/lib/java-cup-11a.jar"/>
-	<classpathentry kind="lib" path="/home/kyrremann/workspace/ThingML-Editor/AutoComplete/trunk/dist/autocomplete.jar"/>
+	<classpathentry kind="lib" path="/home/kyrremann/workspace/ThingML-Editor/AutoComplete/trunk/dist/autocomplete.jar" sourcepath="/home/kyrremann/workspace/fork/ThingML/AutoComplete/trunk/src"/>
 	<classpathentry kind="lib" path="/home/kyrremann/workspace/ThingML-Editor/ThingMLDemo/dist/language_support.jar"/>
 	<classpathentry kind="src" path="/org.thingml.compilers"/>
 	<classpathentry kind="lib" path="/home/kyrremann/workspace/ThingML/org.thingml.compilers/target/classes"/>

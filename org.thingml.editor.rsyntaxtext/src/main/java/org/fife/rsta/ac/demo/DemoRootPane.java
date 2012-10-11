@@ -16,6 +16,7 @@
 package org.fife.rsta.ac.demo;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
@@ -64,12 +65,13 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 		SyntaxConstants, Actions {
 
 	private static final long serialVersionUID = 6176273020828452215L;
-	private JScrollPane treeSP;
+	private JScrollPane codeTreeSP, configTreeSP;
 	private AbstractSourceTree tree;
-	private RTextScrollPane scrollPane;
-	private RSyntaxTextArea textArea;
-	private AutoCompletion autoCompletion;
+	private RTextScrollPane codeScrollPane, configScrollPane;
+	private RSyntaxTextArea codeArea, configArea;
+	private AutoCompletion autoCodeCompletion, autoConfigCompletion;
 	private JLabel statusLabel, cursorLabel;
+	private JTabbedPane tabbedPane;
 
 	private JCheckBoxMenuItem cellRenderingItem;
 	private JCheckBoxMenuItem showDescWindowItem;
@@ -87,50 +89,93 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 				"org.fife.ui.rsyntaxtextarea.modes.ThingMLTokenMaker");
 		TokenMakerFactory.setDefaultInstance(atmf);
 
-		textArea = createTextArea();
-		// setText("ThingMLExample.txt", SYNTAX_STYLE_THINGML);
-		setText("blink.thingml", SYNTAX_STYLE_THINGML);
-		scrollPane = new RTextScrollPane(textArea, true);
-		scrollPane.setIconRowHeaderEnabled(true);
-		scrollPane.getGutter().setBookmarkingEnabled(true);
+		String file = "blink.thingml";
+		String config = "_arduino/blink.thingml";
+
+		codeArea = createTextArea();
+		setText(file, SYNTAX_STYLE_THINGML);
+		codeScrollPane = new RTextScrollPane(codeArea, true);
+		codeScrollPane.setIconRowHeaderEnabled(true);
+		// scrollPane.getGutter().setBookmarkingEnabled(true);
+
+		configArea = createTextArea();
+		setText(configArea, config, SYNTAX_STYLE_THINGML);
+		configScrollPane = new RTextScrollPane(configArea, true);
+		
+		// Tabbed
+		JTabbedPane tabbedPane = new JTabbedPane();
+		tabbedPane.add(codeScrollPane);
+		tabbedPane.setTitleAt(0, file);
+		tabbedPane.add(configScrollPane);
+		tabbedPane.setTitleAt(1, config);
+		tabbedPane.addChangeListener(new ChangeListener() {
+			
+			public void stateChanged(ChangeEvent e) {
+			System.out.println("it's changed!");	
+			}
+		});
 
 		// Install auto-completion onto our text area
 		if (provider == null)
 			provider = createCompletionProvider();
 
-		autoCompletion = new AutoCompletion(provider);
-		autoCompletion.setListCellRenderer(new ThingMLCellRenderer());
-		autoCompletion.setShowDescWindow(true);
-		autoCompletion.setParameterAssistanceEnabled(true);
-		autoCompletion.install(textArea);
+		autoCodeCompletion = new AutoCompletion(provider);
+		autoCodeCompletion.setListCellRenderer(new ThingMLCellRenderer());
+		autoCodeCompletion.setShowDescWindow(true);
+		autoCodeCompletion.setParameterAssistanceEnabled(true);
+		autoCodeCompletion.install(codeArea);
 
-		textArea.setToolTipSupplier((ToolTipSupplier) provider);
-		ToolTipManager.sharedInstance().registerComponent(textArea);
+		autoConfigCompletion = new AutoCompletion(provider);
+		autoConfigCompletion.setListCellRenderer(new ThingMLCellRenderer());
+		autoConfigCompletion.setShowDescWindow(true);
+		autoConfigCompletion.setParameterAssistanceEnabled(true);
+		autoConfigCompletion.install(configArea);
+
+		// codeArea.setToolTipSupplier((ToolTipSupplier) provider);
+		// ToolTipManager.sharedInstance().registerComponent(codeArea);
+		//
+		// configArea.setToolTipSupplier((ToolTipSupplier) provider);
+		// ToolTipManager.sharedInstance().registerComponent(configArea);
 
 		// Dummy tree keeps JViewport's "background" looking right initially
 		JTree dummy = new JTree((TreeNode) null);
-		treeSP = new JScrollPane(dummy);
+		codeTreeSP = new JScrollPane(dummy);
 
-		final JSplitPane mainSplitPane = new JSplitPane(
-				JSplitPane.HORIZONTAL_SPLIT, treeSP, scrollPane);
+		final JSplitPane codeSplitPane = new JSplitPane(
+				JSplitPane.HORIZONTAL_SPLIT, codeTreeSP, tabbedPane);// scrollPane);
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				mainSplitPane.setDividerLocation(350); // TODO: 150
+				codeSplitPane.setDividerLocation(150); // TODO: 150
 			}
 		});
-		mainSplitPane.setContinuousLayout(true);
+		codeSplitPane.setContinuousLayout(true);
+
+//		configTreeSP = new JScrollPane(dummy);		
+//		final JSplitPane configSplitPane = new JSplitPane(
+//				JSplitPane.HORIZONTAL_SPLIT, configTreeSP, configScrollPane);
+//		SwingUtilities.invokeLater(new Runnable() {
+//			public void run() {
+//				configSplitPane.setDividerLocation(150); // TODO: 150
+//			}
+//		});
+//		configSplitPane.setContinuousLayout(true);
+//
+//		tabbedPane = new JTabbedPane();
+//		tabbedPane.add(codeSplitPane);
+//		tabbedPane.add(configSplitPane);
+//		tabbedPane.setTitleAt(0, file);
+//		tabbedPane.setTitleAt(1, config);
 
 		contentPane.setLayout(new BorderLayout());
-		contentPane.add(mainSplitPane, BorderLayout.CENTER);
+		contentPane.add(codeSplitPane, BorderLayout.CENTER);
 
 		contentPane.add(createToolBar(), BorderLayout.NORTH);
 		contentPane.add(createStatusPanel(), BorderLayout.SOUTH);
 		setJMenuBar(createMenuBar());
-		
 
 		refreshSourceTree();
 	}
-	
+
 	private JPanel createStatusPanel() {
 		JPanel statusPanel = new JPanel();
 		statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -143,7 +188,7 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 		statusLabel = new JLabel("");
 		statusLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		statusPanel.add(statusLabel);
-		
+
 		return statusPanel;
 	}
 
@@ -162,7 +207,7 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 			private static final long serialVersionUID = 4353427735637904252L;
 
 			public void actionPerformed(ActionEvent arg0) {
-				DemoRootPane demoRootPane = new DemoRootPane(autoCompletion
+				DemoRootPane demoRootPane = new DemoRootPane(autoCodeCompletion
 						.getCompletionProvider());
 				demoRootPane.setVisible(true);
 			}
@@ -205,31 +250,38 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 		JToolBar toolbar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
 
 		JButton button = new JButton();
-		button.setAction(new NewFileAction(this, new ImageIcon(getClass().getClassLoader().getResource("images/new.png"))));
+		button.setAction(new NewFileAction(this, new ImageIcon(getClass()
+				.getClassLoader().getResource("images/new.png"))));
 		toolbar.add(button);
-		button = new JButton(new ImageIcon(getClass().getClassLoader().getResource("images/open.png")));
-		button.setAction(new OpenAction(this, new ImageIcon(getClass().getClassLoader().getResource("images/open.png"))));
+		button = new JButton(new ImageIcon(getClass().getClassLoader()
+				.getResource("images/open.png")));
+		button.setAction(new OpenAction(this, new ImageIcon(getClass()
+				.getClassLoader().getResource("images/open.png"))));
 		toolbar.add(button);
 		button = new JButton();
-		button.setAction(new SaveAction(this, new ImageIcon(getClass().getClassLoader().getResource("images/save.png"))));
+		button.setAction(new SaveAction(this, new ImageIcon(getClass()
+				.getClassLoader().getResource("images/save.png"))));
 		toolbar.add(button);
 		toolbar.addSeparator();
 		button = new JButton();
 		button.setAction(new DefaultEditorKit.CutAction());
-		button.setIcon(new ImageIcon(getClass().getClassLoader().getResource("images/cut.png")));
+		button.setIcon(new ImageIcon(getClass().getClassLoader().getResource(
+				"images/cut.png")));
 		button.setText("");
 		toolbar.add(button);
 		button = new JButton();
 		button.setAction(new DefaultEditorKit.CopyAction());
-		button.setIcon(new ImageIcon(getClass().getClassLoader().getResource("images/copy.png")));
+		button.setIcon(new ImageIcon(getClass().getClassLoader().getResource(
+				"images/copy.png")));
 		button.setText("");
 		toolbar.add(button);
 		button = new JButton();
 		button.setAction(new DefaultEditorKit.PasteAction());
-		button.setIcon(new ImageIcon(getClass().getClassLoader().getResource("images/paste.png")));
+		button.setIcon(new ImageIcon(getClass().getClassLoader().getResource(
+				"images/paste.png")));
 		button.setText("");
 		toolbar.add(button);
-		
+
 		return toolbar;
 	}
 
@@ -254,7 +306,7 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 	 * Focuses the text area.
 	 */
 	void focusTextArea() {
-		textArea.requestFocusInWindow();
+		codeArea.requestFocusInWindow();
 	}
 
 	/**
@@ -285,8 +337,8 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 	public void openFile(File file) {
 		try {
 			BufferedReader r = new BufferedReader(new FileReader(file));
-			textArea.read(r, null);
-			textArea.setCaretPosition(0);
+			codeArea.read(r, null);
+			codeArea.setCaretPosition(0);
 			r.close();
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
@@ -304,7 +356,7 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 		try {
 			FileWriter fileWriter = new FileWriter(file);
 			BufferedWriter writer = new BufferedWriter(fileWriter);
-			writer.write(textArea.getText());
+			writer.write(codeArea.getText());
 			writer.close();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -316,14 +368,15 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 	 * Displays a tree view of the current source code, if available for the
 	 * current programming language.
 	 */
+	// TODO: Make this update the chosen tree
 	private void refreshSourceTree() {
 
 		if (tree != null) {
 			tree.uninstall();
-			treeSP.remove(tree);
+			codeTreeSP.remove(tree);
 		}
 
-		String language = textArea.getSyntaxEditingStyle();
+		String language = codeArea.getSyntaxEditingStyle();
 		if (SyntaxConstants.SYNTAX_STYLE_THINGML.equals(language)) {
 			tree = new ThingMLOutlineTree();
 		} else {
@@ -331,10 +384,14 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 		}
 
 		if (tree != null) {
-			tree.listenTo(textArea);
-			treeSP.setViewportView(tree);
-			treeSP.revalidate();
+			tree.listenTo(codeArea);
+			codeTreeSP.setViewportView(tree);
+			codeTreeSP.revalidate();
 		}
+	}
+
+	void setText(String resource, String style) {
+		setText(codeArea, resource, style);
 	}
 
 	/**
@@ -345,7 +402,7 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 	 * @param style
 	 *            The syntax style to use when highlighting the text.
 	 */
-	void setText(String resource, String style) {
+	void setText(RSyntaxTextArea textArea, String resource, String style) {
 
 		textArea.setSyntaxEditingStyle(style);
 
@@ -359,7 +416,7 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 			textArea.setCaretPosition(0);
 			textArea.discardAllEdits();
 
-			if (treeSP != null)
+			if (codeTreeSP != null)
 				refreshSourceTree();
 
 		} catch (RuntimeException re) {
@@ -367,7 +424,6 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 		} catch (Exception e) {
 			textArea.setText("Type here to see syntax highlighting");
 		}
-
 	}
 
 	/**
@@ -471,7 +527,7 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 	 * Focuses the text area.
 	 */
 	public void focusEditor() {
-		textArea.requestFocusInWindow();
+		codeArea.requestFocusInWindow();
 	}
 
 	/**
@@ -487,7 +543,7 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 
 		public void actionPerformed(ActionEvent e) {
 			boolean fancy = cellRenderingItem.isSelected();
-			autoCompletion
+			autoCodeCompletion
 					.setListCellRenderer(fancy ? new ThingMLCellRenderer()
 							: null);
 		}
@@ -507,7 +563,7 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 
 		public void actionPerformed(ActionEvent e) {
 			boolean enabled = paramAssistanceItem.isSelected();
-			autoCompletion.setParameterAssistanceEnabled(enabled);
+			autoCodeCompletion.setParameterAssistanceEnabled(enabled);
 		}
 
 	}
@@ -524,7 +580,7 @@ class DemoRootPane extends JRootPane implements HyperlinkListener,
 
 		public void actionPerformed(ActionEvent e) {
 			boolean show = showDescWindowItem.isSelected();
-			autoCompletion.setShowDescWindow(show);
+			autoCodeCompletion.setShowDescWindow(show);
 		}
 
 	}

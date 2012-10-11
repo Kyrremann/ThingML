@@ -1,4 +1,4 @@
-import "../hardware/bricks/led.thingml"
+import "file:/home/kyrremann/workspace/fork/ThingML/org.thingml.samples/src/main/thingml/hardware/bricks/led.thingml"
 
 thing Blink includes LedMsgs, TimerMsgs
 {

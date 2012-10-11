@@ -16,35 +16,13 @@
 package org.fife.rsta.ac.demo;
 
 import java.awt.Toolkit;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Map;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import org.fife.ui.rsyntaxtextarea.modes.ThingMLTokenMaker;
-import org.sintef.thingml.Configuration;
-import org.sintef.thingml.ThingMLModel;
-import org.sintef.thingml.ThingmlPackage;
-import org.sintef.thingml.resource.thingml.IThingmlTextToken;
-import org.sintef.thingml.resource.thingml.mopp.ThingmlAntlrScanner;
-import org.sintef.thingml.resource.thingml.mopp.ThingmlLexer;
-import org.sintef.thingml.resource.thingml.mopp.ThingmlResourceFactory;
-import org.sintef.thingml.resource.thingml.mopp.ThingmlTextToken;
-import org.thingml.cgenerator.CGenerator;
-//import org.thingml.graphexport.test.StandaloneParserTestLoadFile;
-
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EPackage;
-import org.eclipse.emf.ecore.resource.Resource;
-import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-
 /**
  * Stand-alone version of the demo.
  * 
@@ -59,7 +37,8 @@ public class DemoApp extends JFrame {
 
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setTitle("RSTA Language Support ThingML Demo Application");
-		setRootPane(new DemoRootPane());
+		// setRootPane(new DemoRootPane());
+		setRootPane(new ThingMLRootPane());
 		
 		pack();
 	}
@@ -74,7 +53,7 @@ public class DemoApp extends JFrame {
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
 		if (visible) {
-			((DemoRootPane) getRootPane()).focusTextArea();
+			((ThingMLRootPane) getRootPane()).focusCurrentTextArea();
 		}
 	}
 
@@ -92,7 +71,6 @@ public class DemoApp extends JFrame {
 				try {
 					new DemoApp().setVisible(true);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}

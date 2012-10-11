@@ -75,7 +75,6 @@ public class ThingMLParser extends AbstractParser {
 
 	private PropertyChangeSupport support;
 	private ThingMLTreeNode root;
-	private List lineOffset;
 
 	ThingMLParser(ThingMLLanguageSupport tls) {
 		this.support = new PropertyChangeSupport(this);
@@ -125,7 +124,6 @@ public class ThingMLParser extends AbstractParser {
 			// root = createAst(document);
 			ThingMLTree tree = new ThingMLTree(resource);
 			root = tree.getRoot();
-			System.out.println();
 			int lineCount = document.getDefaultRootElement().getElementCount();
 			result.setParsedLines(0, lineCount - 1);
 		} catch (BadLocationException e1) {
@@ -150,19 +148,6 @@ public class ThingMLParser extends AbstractParser {
 
 		support.firePropertyChange(PROPERTY_AST, null, root);
 		return result;
-	}
-
-	private ThingMLTreeNode createAst(RSyntaxDocument document)
-			throws BadLocationException {
-		ThingmlLexer lexer = new ThingmlLexer();
-		ThingmlAntlrScanner scanner = new ThingmlAntlrScanner(lexer);
-		scanner.setText(document.getText(0, document.getLength()));
-		IThingmlTextToken token = scanner.getNextToken();
-		while (token != null) {
-
-			token = scanner.getNextToken();
-		}
-		return new ThingMLTreeNode("ROOT");
 	}
 
 	public int getIndex(RSyntaxDocument doc, int line, int column) {
