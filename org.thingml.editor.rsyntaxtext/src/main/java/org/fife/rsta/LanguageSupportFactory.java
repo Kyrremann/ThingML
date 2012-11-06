@@ -20,7 +20,7 @@ import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.fife.rsta.ac.LanguageSupport;
+import org.fife.rsta.LanguageSupport;
 import org.fife.rsta.LanguageSupportFactory;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
@@ -47,7 +47,7 @@ public class LanguageSupportFactory implements PropertyChangeListener {
 	 * Client property set on RSyntaxTextAreas that points to the current
 	 * language support for that text area.
 	 */
-	private static final String LANGUAGE_SUPPORT_PROPERTY = "org.fife.rsta.ac.LanguageSupport";
+	private static final String LANGUAGE_SUPPORT_PROPERTY = "org.fife.rsta.LanguageSupport";
 
 	/**
 	 * Constructor.
@@ -78,7 +78,7 @@ public class LanguageSupportFactory implements PropertyChangeListener {
 
 		styleToSupport = new HashMap();
 
-		String prefix = "org.fife.rsta.ac.";
+		String prefix = "org.fife.rsta.";
 
 		addLanguageSupport(SyntaxConstants.SYNTAX_STYLE_THINGML, prefix
 				+ "thingml.ThingMLLanguageSupport");
@@ -167,6 +167,8 @@ public class LanguageSupportFactory implements PropertyChangeListener {
 	 * 
 	 * @param textArea
 	 *            The text area to register.
+	 * @param file
+	 * 			  The ThingML-file source
 	 */
 	public void register(RSyntaxTextArea textArea) {
 		installSupport(textArea);

@@ -72,6 +72,7 @@ import org.fife.rsta.LanguageSupportFactory;
 import org.fife.rsta.demo.Actions;
 import org.fife.rsta.demo.ExtensionFileFilter;
 import org.fife.rsta.thingml.ThingMLCellRenderer;
+import org.fife.rsta.thingml.ThingMLParser;
 import org.fife.rsta.thingml.tree.ThingMLOutlineTree;
 import org.fife.ui.autocomplete.AutoCompletion;
 import org.fife.ui.autocomplete.BasicCompletion;
@@ -131,6 +132,8 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 			}
 		});
 
+		currentFilePath = "http://www.ThingML.org/";
+
 		JTree dummy = new JTree((TreeNode) null);
 		treeSP = new JScrollPane(dummy);
 		final JSplitPane codeSplitPane = new JSplitPane(
@@ -148,7 +151,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		contentPane.add(createToolBar(), BorderLayout.NORTH);
 		contentPane.add(createStatusPanel(), BorderLayout.SOUTH);
 		setJMenuBar(createMenuBar());
-		
+
 		newFile();
 		setFocusedTextArea(0);
 		refreshSourceTree();
@@ -546,25 +549,30 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 		// Load the model
 		ResourceSet rs = new ResourceSetImpl();
-		
+
 		if (configFileName == null) {
-			JFileChooser chooser = new JFileChooser("./src/main/resources/samples");
+			JFileChooser chooser = new JFileChooser(
+					"./src/main/resources/samples");
 			chooser.setFileFilter(new ExtensionFileFilter(
 					"ThingML Source Files", "thingml"));
-			
+
 			int rc = chooser.showOpenDialog(this);
 			if (rc == JFileChooser.APPROVE_OPTION) {
 				try {
-					// TODO: Should be solved with a config file for each project
-					// or maybe even change the ThingML-language a bit guess I need
+					// TODO: Should be solved with a config file for each
+					// project
+					// or maybe even change the ThingML-language a bit guess I
+					// need
 					// to discuss this with Franck. Maybe it's master material?
-					configFileName = chooser.getSelectedFile().getCanonicalPath();
+					configFileName = chooser.getSelectedFile()
+							.getCanonicalPath();
 					// TODO Handle it when user sets wrong config file
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			} else {
-				System.err.println("User pressed cancel. Ready for an exception?");
+				System.err
+						.println("User pressed cancel. Ready for an exception?");
 				// TODO Handle user not wanting to compile after all
 			}
 		}
@@ -658,11 +666,14 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 			UIManager.getLookAndFeel().provideErrorFeedback(this);
 			return;
 		}
+
+		// TODO: Config file need to be set
+		// ((ThingMLParser)
+		// getCurrentTextArea().getParser(1)).setFilePath(configFileName);
 	}
 
 	public void newFile() {
-		RSyntaxTextArea rSyntaxTextArea = createAndAddTextArea("Untitle",
-				null);
+		RSyntaxTextArea rSyntaxTextArea = createAndAddTextArea("Untitle", null);
 		rSyntaxTextArea.setSyntaxEditingStyle(SYNTAX_STYLE_THINGML);
 		rSyntaxTextArea.setCaretPosition(0);
 		setCurrentFilePath(null);

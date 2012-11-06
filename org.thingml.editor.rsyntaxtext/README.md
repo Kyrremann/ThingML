@@ -1,1 +1,1 @@
-mvn exec:java -Dexec.mainClass="org.fife.rsta.ac.demo.DemoApp"
+mvn exec:java -Dexec.mainClass="org.fife.rsta.demo.ThingMLApp"

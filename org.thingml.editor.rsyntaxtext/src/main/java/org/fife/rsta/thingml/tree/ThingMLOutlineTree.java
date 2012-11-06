@@ -26,7 +26,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import org.fife.rsta.AbstractSourceTree;
-import org.fife.rsta.ac.LanguageSupport;
+import org.fife.rsta.LanguageSupport;
 import org.fife.rsta.LanguageSupportFactory;
 import org.fife.rsta.thingml.tree.ThingMLTreeCellRenderer;
 import org.fife.rsta.thingml.tree.ThingMLTreeNode;

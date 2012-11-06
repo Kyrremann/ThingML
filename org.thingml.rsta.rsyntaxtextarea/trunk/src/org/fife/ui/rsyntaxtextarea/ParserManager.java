@@ -149,7 +149,7 @@ class ParserManager implements DocumentListener, ActionListener,
 			for (int i=0; i<parserCount; i++) {
 				Parser parser = getParser(i);
 				if (parser.isEnabled()) {
-					ParseResult res = parser.parse(doc, style);
+				    ParseResult res = parser.parse(doc, style);
 					addParserNoticeHighlights(res);
 				}
 				else {

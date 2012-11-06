@@ -18,6 +18,7 @@ package org.fife.rsta.thingml;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.fife.rsta.thingml.ThingMLLanguageSupport;
 import org.fife.rsta.thingml.tree.ThingMLTree;
 import org.fife.rsta.thingml.tree.ThingMLTreeNode;
@@ -68,8 +69,10 @@ public class ThingMLParser extends AbstractParser {
 	private ThingMLTreeNode root;
 	private ThingmlResource resource;
 	private ThingMLTree tree;
+	private String currentFilePath;
 
 	ThingMLParser(ThingMLLanguageSupport thingMLLanguageSupport) {
+		this.currentFilePath = "http://www.ThingML.org/";
 		this.support = new PropertyChangeSupport(this);
 	}
 
@@ -100,7 +103,10 @@ public class ThingMLParser extends AbstractParser {
 
 		try {
 			start = System.currentTimeMillis();
-			resource = new ThingmlResource(URI.createURI("http://thingml.org"));
+			currentFilePath = "/home/kyrremann/workspace/fork/ThingML/org.thingml.editor.rsyntaxtext/src/main/resources/samples/samples/blink.thingml";
+			resource =  null;
+			resource = new ThingmlResource(URI.createURI(getCurrentFilePath()));
+			System.out.println("URI: " + resource.getURI());
 			ResourceSetImpl resourceSetImpl = new ResourceSetImpl();
 			resourceSetImpl.getResources().add(resource);
 			InputStream inputStream;
@@ -111,6 +117,17 @@ public class ThingMLParser extends AbstractParser {
 
 			if (!resource.getErrors().isEmpty())
 				throw new ParseException("", -1);
+
+			EcoreUtil.resolveAll(resource);
+
+			System.out.println("Errors size: " + resource.getErrors().size());
+			for (Diagnostic diagnostic : resource.getErrors())
+				System.out.println(diagnostic.toString());
+
+//			System.out
+//					.println("Warning size: " + resource.getWarnings().size());
+			// for (Diagnostic diagnostic : resource.getWarnings())
+			// System.out.println(diagnostic.toString());
 
 			long time = System.currentTimeMillis() - start;
 			result.setParseTime(time);
@@ -149,5 +166,13 @@ public class ThingMLParser extends AbstractParser {
 	public int getLength(String message) {
 		// TODO: Not a proper way to find the length
 		return message.split("\"")[1].split(" ")[0].length();
+	}
+
+	public void setFilePath(String currentFilePath) {
+		this.currentFilePath = currentFilePath;
+	}
+
+	public String getCurrentFilePath() {
+		return currentFilePath;
 	}
 }

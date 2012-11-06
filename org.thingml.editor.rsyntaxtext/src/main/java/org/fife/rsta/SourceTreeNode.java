@@ -23,7 +23,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreeNode;
 
-import org.fife.rsta.ac.AbstractSourceTree;
+import org.fife.rsta.AbstractSourceTree;
 import org.fife.rsta.SourceTreeNode;
 
 

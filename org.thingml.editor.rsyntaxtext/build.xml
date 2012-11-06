@@ -19,30 +19,6 @@
 
 <!-- 
 
-	This is the Ant build script for the RSyntaxTextArea language support jar.
-	You can build a jar that adds support to RSTA for any combination of the
-	following languages:
-	
-		- C
-		- Groovy
-		- HTML
-		- Java
-		- JavaScript
-		- JSP
-		- Perl
-		- PHP
-		- Unix Shell
-		- ThingML
-		- XML
-	
-	Available targets include:
-	
-		1. compile:         Compiles all org.fife classes into ${class-dir}.
-		2. make-jar:        Creates the jar file.
-
-	Note that to build this project, you will need the two sister projects
-	"RSyntaxTextArea" and "AutoComplete" checked out along-side this one.
-
 	Author:   Robert Futrell
 	Version:  0.8.0
 	Date:     02/19/2012
@@ -90,15 +66,15 @@
 	<pathelement     location="${rsta-jar}"/>
 	<pathelement     location="${autocomplete-jar}"/>
 	<pathelement	 location="lib/java-cup-11a.jar"/>
-	<path            location="../../ThingML/org.thingml.compilers/target/classes/*"/>
-	<path            location="../../ThingML/org.thingml.compilers/target/test-classes/*"/>
+	<path            location="../org.thingml.compilers/target/classes/*"/>
+	<path            location="../org.thingml.compilers/target/test-classes/*"/>
       </classpath>
       
-      <include                  name="org/fife/rsta/ac/*"/>
-      <include                  name="org/fife/rsta/ac/common/*"/>
+      <include                  name="org/fife/rsta/*"/>
+      <include                  name="org/fife/rsta/common/*"/>
 
-      <include if="thingml"	name="org/fife/rsta/ac/thingml/**"/>
-      <include if="demo"        name="org/fife/rsta/ac/demo/**"/>
+      <include if="thingml"	name="org/fife/rsta/thingml/**"/>
+      <include if="demo"        name="org/fife/rsta/demo/**"/>
 
     </javac>
   </target>
@@ -116,13 +92,13 @@
 	<include if="thingml"   name="data/thingml.xml"/>
       </fileset>
       <fileset dir="src">
-    	<include if="thingml" name="org/fife/rsta/ac/thingml/**/*.png"/>
+    	<include if="thingml" name="org/fife/rsta/thingml/**/*.png"/>
       </fileset>
     <fileset dir="res">
     	<include if="demo" name="**"/>
       </fileset>
       <manifest>
-	<attribute name="Main-Class" value="org.fife.rsta.ac.demo.DemoApp"/>
+	<attribute name="Main-Class" value="org.fife.rsta.demo.DemoApp"/>
 	<attribute name="Class-Path" value="rsyntaxtextarea.jar autocomplete.jar js-14_Patch_716562.jar java-cup-11a.jar"/>
 	<attribute name="Specification-Title" value="RSyntaxTextArea Language Support"/>
 	<attribute name="Specification-Version" value="${version}"/>

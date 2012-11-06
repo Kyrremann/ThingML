@@ -33,7 +33,7 @@ public interface LanguageSupport {
 //	 * <code>AutoCompletion</code> instance providing its completion choices.
 //	 */
 //	public static final String PROPERTY_AUTO_COMPLETION	=
-//										"org.fife.rsta.ac.AutoCompletion";
+//										"org.fife.rsta.AutoCompletion";
 
 	/**
 	 * Client property set on <code>RSyntaxTextArea</code>s referencing the
@@ -41,7 +41,7 @@ public interface LanguageSupport {
 	 * <code>null</code> if a language support does not install such a parser.
 	 */
 	public static final String PROPERTY_LANGUAGE_PARSER =
-		"org.fife.rsta.ac.LanguageSupport.LanguageParser";
+		"org.fife.rsta.LanguageSupport.LanguageParser";
 
 
 	/**

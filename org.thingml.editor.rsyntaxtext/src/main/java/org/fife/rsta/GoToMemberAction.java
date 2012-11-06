@@ -24,8 +24,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.text.TextAction;
 
-import org.fife.rsta.ac.AbstractSourceTree;
-import org.fife.rsta.ac.GoToMemberWindow;
+import org.fife.rsta.AbstractSourceTree;
+import org.fife.rsta.GoToMemberWindow;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
 

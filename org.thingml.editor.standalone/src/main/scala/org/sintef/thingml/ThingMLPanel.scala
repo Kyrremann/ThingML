@@ -125,10 +125,12 @@ class ThingMLPanel extends JPanel {
 
           // Load the model
           val thingmlModel = loadThingMLmodel(targetFile.get)
+	      System.out.println("Thing " + thingmlModel.getTypes() + "\nConfigs: " + thingmlModel.getConfigs() + "\nimports " + thingmlModel.getImports());
 
           var arduino_dir = ThingMLSettings.get_arduino_dir_or_choose_if_not_set(ThingMLPanel.this)
 
           if (arduino_dir != null) {
+	      // 	      System.out.print("Ard: " + arduino_dir + "\nLib " + ThingMLSettings.get_arduino_lib_dir());
             CGenerator.compileAndRunArduino(thingmlModel, arduino_dir, ThingMLSettings.get_arduino_lib_dir())
           }
           /*
@@ -318,6 +320,7 @@ class ThingMLPanel extends JPanel {
   menubar.add(compilersMenu)
   
   def loadThingMLmodel(file : File) = {
+  System.out.println(file);
     var rs: ResourceSet = new ResourceSetImpl
     var xmiuri: URI = URI.createFileURI(file.getAbsolutePath)
     var model: Resource = rs.createResource(xmiuri)
@@ -355,6 +358,7 @@ class ThingMLPanel extends JPanel {
         var resource : Resource = null
 
         if (!targetFile.isEmpty) {
+	  System.out.println("Targetfile " + targetFile.get.getAbsolutePath)
           resource = new ThingmlResource(URI.createFileURI(targetFile.get.getAbsolutePath))
         }
         else resource = new ThingmlResource(URI.createURI("http://thingml.org"))

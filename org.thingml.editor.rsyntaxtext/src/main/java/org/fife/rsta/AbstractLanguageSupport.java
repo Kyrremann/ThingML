@@ -22,7 +22,7 @@ import java.util.Set;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.ListCellRenderer;
 
-import org.fife.rsta.ac.LanguageSupport;
+import org.fife.rsta.LanguageSupport;
 import org.fife.ui.autocomplete.AutoCompletion;
 import org.fife.ui.autocomplete.CompletionProvider;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;

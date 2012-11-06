@@ -8,7 +8,7 @@
 	<classpathentry kind="lib" path="/home/kyrremann/workspace/ThingML-Editor/ThingMLDemo/dist/language_support.jar"/>
 	<classpathentry kind="src" path="/org.thingml.compilers"/>
 	<classpathentry kind="lib" path="/home/kyrremann/workspace/ThingML/org.thingml.compilers/target/classes"/>
-	<classpathentry kind="lib" path="/home/kyrremann/workspace/ThingML/org.thingml.model/target/classes"/>
+	<classpathentry kind="lib" path="/home/kyrremann/workspace/ThingML/org.thingml.model/target/classes/org"/>
 	<classpathentry kind="lib" path="/home/kyrremann/workspace/ThingML/org.emftext.commons.antlr3_3_0/target/classes"/>
 	<classpathentry kind="lib" path="/home/kyrremann/.m2/repository/org/kevoree/extra/org.kevoree.extra.emf.library/2.7.0/org.kevoree.extra.emf.library-2.7.0.jar">
 		<attributes>
