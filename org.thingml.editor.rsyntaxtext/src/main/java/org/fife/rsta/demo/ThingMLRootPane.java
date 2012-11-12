@@ -18,6 +18,7 @@ package org.fife.rsta.demo;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,6 +48,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
@@ -66,7 +68,9 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.fife.rsta.AbstractSourceTree;
 import org.fife.rsta.LanguageSupportFactory;
 import org.fife.rsta.demo.Actions;
@@ -349,7 +353,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		statusPanel.setPreferredSize(new Dimension(this.getWidth(), 16));
 		statusPanel.setLayout(new BoxLayout(statusPanel, BoxLayout.X_AXIS));
 
-		cursorLabel = new JLabel("Line: 0 - Char: 0");
+		cursorLabel = new JLabel("Char: 0");
 		cursorLabel.setHorizontalAlignment(SwingConstants.LEFT);
 		statusPanel.add(cursorLabel);
 		statusLabel = new JLabel("");
@@ -380,6 +384,10 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		menu.addSeparator();
 
 		menu.add(new JMenuItem(new ExitAction()));
+		mb.add(menu);
+
+		menu = new JMenu("Edit");
+		menu.add(new JMenuItem(new CloseTab()));
 		mb.add(menu);
 
 		menu = new JMenu("View");
@@ -470,6 +478,25 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		toolbar.add(button);
 
 		return toolbar;
+	}
+
+	private class CloseTab extends AbstractAction {
+
+		public CloseTab() {
+			putValue(NAME, "Close tab");
+			putValue(MNEMONIC_KEY, new Integer('W'));
+			int mods = getToolkit().getMenuShortcutKeyMask();
+			KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_W, mods);
+			putValue(ACCELERATOR_KEY, ks);
+		}
+
+		public void actionPerformed(ActionEvent arg0) {
+			if (tabbedPane.getComponentCount() > 1) {
+				// tabbedPane.remove(tabbedPane.getSelectedIndex());
+				// TODO: Ask Franck about this problem
+				tabbedPane.remove(tabbedPane.getSelectedComponent());
+			}
+		}
 	}
 
 	/**
@@ -597,9 +624,14 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		String arduinoDir = "/home/kyrremann/bin/arduino-0022";
 		String libdir = arduinoDir + "/lib";
 
+		// TODO: Config file need to be set
+		// System.out.println("Open: " + configFileName);
+		// ((ThingMLParser)
+		// getCurrentTextArea().getParser(1)).setFilePath(configFileName);
+
 		// TODO: Maybe I can split this up, since I've already made a model of
 		// the code
-		CGenerator.compileAndRunArduino(model, arduinoDir, libdir);
+		// CGenerator.compileAndRunArduino(model, arduinoDir, libdir);
 	}
 
 	public void uninstallSourceTree() {
@@ -666,10 +698,6 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 			UIManager.getLookAndFeel().provideErrorFeedback(this);
 			return;
 		}
-
-		// TODO: Config file need to be set
-		// ((ThingMLParser)
-		// getCurrentTextArea().getParser(1)).setFilePath(configFileName);
 	}
 
 	public void newFile() {

@@ -358,17 +358,16 @@ class ThingMLPanel extends JPanel {
         var resource : Resource = null
 
         if (!targetFile.isEmpty) {
-	  System.out.println("Targetfile " + targetFile.get.getAbsolutePath)
+	  System.out.println("Targetfile: " + targetFile.get.getAbsolutePath);
           resource = new ThingmlResource(URI.createFileURI(targetFile.get.getAbsolutePath))
         }
         else resource = new ThingmlResource(URI.createURI("http://thingml.org"))
-
-	System.out.println(targetFile.get.getAbsolutePath);
 
         // It does not really work without a resourceSet
         val rset = new ResourceSetImpl()
         rset.getResources.add(resource)
 
+	System.out.println("Text: " + codeEditor.getText)
         // This is the text from the editor
         val stream = new ByteArrayInputStream(codeEditor.getText.getBytes);
         resource.load(stream, null);

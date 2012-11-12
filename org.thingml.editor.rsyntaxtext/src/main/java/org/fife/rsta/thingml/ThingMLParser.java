@@ -16,6 +16,8 @@
 package org.fife.rsta.thingml;
 
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EPackage;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -28,7 +30,9 @@ import org.fife.ui.rsyntaxtextarea.parser.DefaultParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.DefaultParserNotice;
 import org.fife.ui.rsyntaxtextarea.parser.ParseResult;
 import org.fife.ui.rsyntaxtextarea.parser.ParserNotice;
+import org.sintef.thingml.ThingmlPackage;
 import org.sintef.thingml.resource.thingml.mopp.ThingmlResource;
+import org.sintef.thingml.resource.thingml.mopp.ThingmlResourceFactory;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -96,6 +100,13 @@ public class ThingMLParser extends AbstractParser {
 	}
 
 	public ParseResult parse(RSyntaxDocument document, String arg1) {
+
+		// Register the generated package and the XMI Factory
+		EPackage.Registry.INSTANCE.put(ThingmlPackage.eNS_URI,
+				ThingmlPackage.eINSTANCE);
+		Resource.Factory.Registry.INSTANCE.getExtensionToFactoryMap().put(
+				"thingml", new ThingmlResourceFactory());
+
 		DefaultParseResult result = new DefaultParseResult(this);
 		resource = null;
 
@@ -103,10 +114,11 @@ public class ThingMLParser extends AbstractParser {
 
 		try {
 			start = System.currentTimeMillis();
-			currentFilePath = "/home/kyrremann/workspace/fork/ThingML/org.thingml.editor.rsyntaxtext/src/main/resources/samples/samples/blink.thingml";
-			resource =  null;
-			resource = new ThingmlResource(URI.createURI(getCurrentFilePath()));
-			System.out.println("URI: " + resource.getURI());
+			resource = null;
+			// System.out.println("Filepath: " + getCurrentFilePath());
+			String file = "/home/kyrremann/workspace/fork/ThingML/org.thingml.editor.rsyntaxtext/src/main/resources/samples/samples/_arduino/blink.thingml";
+			resource = new ThingmlResource(URI.createFileURI(file));
+
 			ResourceSetImpl resourceSetImpl = new ResourceSetImpl();
 			resourceSetImpl.getResources().add(resource);
 			InputStream inputStream;
@@ -118,16 +130,17 @@ public class ThingMLParser extends AbstractParser {
 			if (!resource.getErrors().isEmpty())
 				throw new ParseException("", -1);
 
+			// TODO: Major problem, seems to only work on full paths :\
 			EcoreUtil.resolveAll(resource);
 
 			System.out.println("Errors size: " + resource.getErrors().size());
 			for (Diagnostic diagnostic : resource.getErrors())
 				System.out.println(diagnostic.toString());
 
-//			System.out
-//					.println("Warning size: " + resource.getWarnings().size());
-			// for (Diagnostic diagnostic : resource.getWarnings())
-			// System.out.println(diagnostic.toString());
+			System.out
+					.println("Warning size: " + resource.getWarnings().size());
+			for (Diagnostic diagnostic : resource.getWarnings())
+				System.out.println(diagnostic.toString());
 
 			long time = System.currentTimeMillis() - start;
 			result.setParseTime(time);
