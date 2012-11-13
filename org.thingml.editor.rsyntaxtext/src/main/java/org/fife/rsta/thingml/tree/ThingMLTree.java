@@ -18,7 +18,6 @@ package org.fife.rsta.thingml.tree;
 import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
 import org.fife.rsta.thingml.tree.ThingMLTreeNode;
-import org.fife.rsta.demo.ThingMLRootPane;
 import org.sintef.thingml.Action;
 import org.sintef.thingml.ActionBlock;
 import org.sintef.thingml.ConditionalAction;
@@ -91,10 +90,13 @@ public class ThingMLTree {
 			ThingMLModel impl = (ThingMLModel) object;
 			if (root == null)
 				this.root = new ThingMLTreeNode("ROOT");
+
 			for (ThingMLModel model : impl.getImports()) {
-				this.root.add(new ThingMLTreeNode(((ThingMLModelImpl) model)
-						.eProxyURI().fragment()
-						.replaceFirst("^[A-Z_]*_\\d_", "")));
+				// TODO: Nullpointer here
+				if (((ThingMLModelImpl) model).eProxyURI() != null)
+					this.root.add(new ThingMLTreeNode(
+							((ThingMLModelImpl) model).eProxyURI().fragment()
+									.replaceFirst("^[A-Z_]*_\\d_", "")));
 			}
 
 			for (EObject config : impl.getConfigs())

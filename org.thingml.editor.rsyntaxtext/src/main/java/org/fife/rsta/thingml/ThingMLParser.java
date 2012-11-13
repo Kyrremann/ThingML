@@ -133,14 +133,29 @@ public class ThingMLParser extends AbstractParser {
 			// TODO: Major problem, seems to only work on full paths :\
 			EcoreUtil.resolveAll(resource);
 
-			System.out.println("Errors size: " + resource.getErrors().size());
-			for (Diagnostic diagnostic : resource.getErrors())
-				System.out.println(diagnostic.toString());
+			// System.out.println("Errors size: " +
+			// resource.getErrors().size());
+			// for (Diagnostic diagnostic : resource.getErrors())
+			// System.out.println(diagnostic.toString());
+			//
+			// System.out
+			// .println("Warning size: " + resource.getWarnings().size());
+			// for (Diagnostic diagnostic : resource.getWarnings())
+			// System.out.println(diagnostic.toString());
 
-			System.out
-					.println("Warning size: " + resource.getWarnings().size());
-			for (Diagnostic diagnostic : resource.getWarnings())
-				System.out.println(diagnostic.toString());
+			// Register errors
+			int offset;
+			for (Diagnostic diagnostic : resource.getErrors()) {
+				offset = getIndex(document, diagnostic.getLine(),
+						diagnostic.getColumn());
+				// System.out.printf("Col: %d\nLin: %d\nMes: %s\n",
+				// diagnostic.getColumn(), diagnostic.getLine(),
+				// diagnostic.getMessage());
+				DefaultParserNotice notice = new DefaultParserNotice(this,
+						diagnostic.getMessage(), diagnostic.getLine(), offset,
+						5);
+				result.addNotice(notice);
+			}
 
 			long time = System.currentTimeMillis() - start;
 			result.setParseTime(time);
@@ -178,7 +193,8 @@ public class ThingMLParser extends AbstractParser {
 
 	public int getLength(String message) {
 		// TODO: Not a proper way to find the length
-		return message.split("\"")[1].split(" ")[0].length();
+		// return message.split("\"")[1].split(" ")[0].length();
+		return message.length();
 	}
 
 	public void setFilePath(String currentFilePath) {

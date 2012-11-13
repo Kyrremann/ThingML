@@ -19,7 +19,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Properties;
 
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
@@ -32,7 +35,6 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import org.fife.rsta.demo.AboutDialog;
 import org.fife.rsta.demo.ThingMLRootPane;
 import org.fife.rsta.demo.ExtensionFileFilter;
-
 
 /**
  * Container for all actions used by the demo.
@@ -166,6 +168,11 @@ interface Actions {
 		}
 
 		public void actionPerformed(ActionEvent event) {
+			// TODO: Save actions, see list below
+			// Add .thingml if missing
+			// Update properties file
+			// Save on exit
+			// auto save every few minutes or for each compile
 			if (chooser == null) {
 				chooser = new JFileChooser();
 				chooser.setFileFilter(new ExtensionFileFilter(
@@ -179,6 +186,7 @@ interface Actions {
 					String filename = chooser.getSelectedFile()
 							.getCanonicalPath();
 					rootPane.setCurrentFilePath(filename);
+					rootPane.setTabTitle(chooser.getSelectedFile().getName());
 					FileWriter fstream = new FileWriter(filename);
 					BufferedWriter out = new BufferedWriter(fstream);
 					out.write(rootPane.getCurrentTextArea().getText());
@@ -290,7 +298,7 @@ interface Actions {
 			super(title);
 			this.rootPane = rootPane;
 			this.title = title;
-			// putValue(NAME, "Compile to Arduino");
+			// putValue(NAME, "ThingML Samples");
 			// putValue(MNEMONIC_KEY, new Integer('A'));
 			// int mods = demo.getToolkit().getMenuShortcutKeyMask();
 			// KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_A, mods);
@@ -298,20 +306,37 @@ interface Actions {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			if (title.equals("Blink"))
+			if (title.equals("Blink")) {
 				rootPane.openFile(new File(
 						"src/main/resources/samples/samples/blink.thingml"));
-			else if (title.equals("Blink 2 leds"))
+				loadPropertiesAndSetfiles("src/main/resources/samples/samples/blink.properties");
+			} else if (title.equals("Blink 2 leds")) {
 				rootPane.openFile(new File(
 						"src/main/resources/samples/samples/blink2leds.thingml"));
-			else if (title.equals("Blink 4 leds"))
+				loadPropertiesAndSetfiles("src/main/resources/samples/samples/blink2leds.properties");
+			} else if (title.equals("Blink 4 leds")) {
 				rootPane.openFile(new File(
 						"src/main/resources/samples/samples/blink4leds.thingml"));
-			else if (title.equals("Blink frequency"))
+				loadPropertiesAndSetfiles("src/main/resources/samples/samples/blink4leds.properties");
+			} else if (title.equals("Blink frequency")) {
 				rootPane.openFile(new File(
 						"src/main/resources/samples/samples/blink_freq.thingml"));
+				loadPropertiesAndSetfiles("src/main/resources/samples/samples/blink_freq.properties");
+			}
 		}
 
+		private void loadPropertiesAndSetfiles(String name) {
+			Properties properties = new Properties();
+			try {
+				properties.load(new FileInputStream(name));
+				rootPane.setPropertiesPath(name);
+				rootPane.setConfigFilePath(properties.getProperty("config", ""));
+				rootPane.setArduinoPath(properties.getProperty("arduino", ""));
+				rootPane.putProperties(properties);
+			} catch (IOException e) {
+				e.getStackTrace();
+			}
+		}
 	}
 
 }

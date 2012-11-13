@@ -20,11 +20,13 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Scanner;
 
 import javax.swing.AbstractAction;
@@ -105,6 +107,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	private JLabel statusLabel, cursorLabel;
 	private JTabbedPane tabbedPane;
 	private List<RSyntaxTextArea> textAreas;
+	private List<Properties> properties;
 
 	private JCheckBoxMenuItem cellRenderingItem;
 	private JCheckBoxMenuItem showDescWindowItem;
@@ -114,6 +117,8 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 	private String currentFilePath;
 	private String configFileName;
+	private String propertiesPath;
+	private String arduinoPath;
 
 	public ThingMLRootPane() {
 		this(null);
@@ -127,11 +132,15 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 				"org.fife.ui.rsyntaxtextarea.modes.ThingMLTokenMaker");
 		TokenMakerFactory.setDefaultInstance(atmf);
 		textAreas = new ArrayList<RSyntaxTextArea>();
+		properties = new ArrayList<Properties>();
+		
 		tabbedPane = new JTabbedPane();
 		tabbedPane.addChangeListener(new ChangeListener() {
 
 			public void stateChanged(ChangeEvent event) {
+				// TODO: When changing tab, change all the current files :\
 				setFocusedTextArea(tabbedPane.getSelectedIndex());
+				loadProperties(tabbedPane.getSelectedIndex());
 				refreshSourceTree();
 			}
 		});
@@ -372,6 +381,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		menu.add(new JMenuItem(new NewFileAction(this, null)));
 		menu.add(new JMenuItem(new OpenAction(this, null)));
 		menu.add(new JMenuItem(new SaveAction(this, null)));
+		menu.add(new JMenuItem(new ProjectAction(this)));
 
 		menu.addSeparator();
 		JMenu examples = new JMenu("Samples");
@@ -480,7 +490,30 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		return toolbar;
 	}
 
+	private class ProjectAction extends AbstractAction {
+
+		private static final long serialVersionUID = 6015770944269644342L;
+		private ThingMLRootPane rootPane;
+
+		public ProjectAction(ThingMLRootPane rootPane) {
+			this.rootPane = rootPane;
+			putValue(NAME, "Properties");
+			// putValue(MNEMONIC_KEY, new Integer('W'));
+			// int mods = getToolkit().getMenuShortcutKeyMask();
+			// KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_W, mods);
+			// putValue(ACCELERATOR_KEY, ks);
+		}
+
+		public void actionPerformed(ActionEvent arg0) {
+			ProjectDialog dialog = new ProjectDialog((ThingMLApp) SwingUtilities.getWindowAncestor(rootPane), getCurrentProperties());
+			dialog.setLocationRelativeTo(rootPane);
+			dialog.setVisible(true);
+		}
+	}
+
 	private class CloseTab extends AbstractAction {
+
+		private static final long serialVersionUID = -7124045554769969122L;
 
 		public CloseTab() {
 			putValue(NAME, "Close tab");
@@ -492,8 +525,8 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 		public void actionPerformed(ActionEvent arg0) {
 			if (tabbedPane.getComponentCount() > 1) {
-				// tabbedPane.remove(tabbedPane.getSelectedIndex());
-				// TODO: Ask Franck about this problem
+				textAreas.remove(tabbedPane.getSelectedIndex());
+				properties.remove(tabbedPane.getSelectedIndex());
 				tabbedPane.remove(tabbedPane.getSelectedComponent());
 			}
 		}
@@ -577,7 +610,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		// Load the model
 		ResourceSet rs = new ResourceSetImpl();
 
-		if (configFileName == null) {
+		if (getConfigFilePath() == null) {
 			JFileChooser chooser = new JFileChooser(
 					"./src/main/resources/samples");
 			chooser.setFileFilter(new ExtensionFileFilter(
@@ -591,8 +624,9 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 					// or maybe even change the ThingML-language a bit guess I
 					// need
 					// to discuss this with Franck. Maybe it's master material?
-					configFileName = chooser.getSelectedFile()
-							.getCanonicalPath();
+
+					setConfigFilePath(chooser.getSelectedFile()
+							.getCanonicalPath());
 					// TODO Handle it when user sets wrong config file
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -604,7 +638,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 			}
 		}
 
-		URI xmiuri = URI.createFileURI(configFileName);
+		URI xmiuri = URI.createFileURI(getConfigFilePath());
 		Resource resource = rs.createResource(xmiuri);
 		try {
 			resource.load(null);
@@ -621,8 +655,8 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		ThingmlResource resource = getThingmlResource();
 		ThingMLModel model = (ThingMLModel) resource.getContents().get(0);
 
-		String arduinoDir = "/home/kyrremann/bin/arduino-0022";
-		String libdir = arduinoDir + "/lib";
+		// String arduinoDir = "/home/kyrremann/bin/arduino-0022";
+		//String libdir = arduinoDir + "/lib";
 
 		// TODO: Config file need to be set
 		// System.out.println("Open: " + configFileName);
@@ -631,7 +665,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 		// TODO: Maybe I can split this up, since I've already made a model of
 		// the code
-		// CGenerator.compileAndRunArduino(model, arduinoDir, libdir);
+		CGenerator.compileAndRunArduino(model, getArduinoPath(), getArduinoPath() + "/lib");
 	}
 
 	public void uninstallSourceTree() {
@@ -652,6 +686,38 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	 */
 	public void setCurrentFilePath(String filePath) {
 		this.currentFilePath = filePath;
+	}
+	
+	public Properties getCurrentProperties() {
+		return properties.get(tabbedPane.getSelectedIndex());
+	}
+	
+	public String getPropertiesPath() {
+		return propertiesPath;
+	}
+	
+	public void setPropertiesPath(String propertiesPath) {
+		this.propertiesPath =  propertiesPath;
+	}
+	
+	public String getConfigFilePath() {
+		return configFileName;
+	}
+	
+	public void setConfigFilePath(String configFileName) {
+		this.configFileName = configFileName;
+	}
+	
+	public String getArduinoPath() {
+		return arduinoPath;
+	}
+	
+	public void setArduinoPath(String arudino) {
+		this.arduinoPath = arudino;
+	}
+	
+	public void setTabTitle(String title) {
+		tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), title);
 	}
 
 	public int addTextArea(String title, RSyntaxTextArea rSyntaxTextArea,
@@ -705,7 +771,22 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		rSyntaxTextArea.setSyntaxEditingStyle(SYNTAX_STYLE_THINGML);
 		rSyntaxTextArea.setCaretPosition(0);
 		setCurrentFilePath(null);
+		properties.add(new Properties());
 		if (treeSP != null)
 			refreshSourceTree();
+	}
+	
+	private void loadProperties(int index) {
+		try {
+		Properties prop = this.properties.get(index);
+		setConfigFilePath(prop.getProperty("config", ""));
+		setArduinoPath(prop.getProperty("arduino", ""));
+		} catch (IndexOutOfBoundsException e) {
+			
+		}
+	}
+	
+	public void putProperties(Properties properties) {
+		this.properties.add(properties);
 	}
 }
