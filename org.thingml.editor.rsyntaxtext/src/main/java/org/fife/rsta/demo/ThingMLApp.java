@@ -16,6 +16,9 @@
 package org.fife.rsta.demo;
 
 import java.awt.Toolkit;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 
 import javax.swing.JFrame;
@@ -23,6 +26,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
+
 /**
  * Stand-alone version of the demo.
  * 
@@ -35,10 +39,16 @@ public class ThingMLApp extends JFrame {
 
 	public ThingMLApp() throws IOException {
 
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		// setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setTitle("RSTA Language Support ThingML Demo Application");
 		setRootPane(new ThingMLRootPane());
-		
+		addWindowListener(new WindowAdapter() {
+
+			public void windowClosing(WindowEvent we) {
+				((ThingMLRootPane) getRootPane()).saveTabs();
+				System.exit(0);
+			}
+		});
 		pack();
 	}
 

@@ -98,7 +98,7 @@ interface Actions {
 			super(null, icon);
 			this.rootPane = demo;
 			if (icon == null)
-				putValue(NAME, "Open...");
+				putValue(NAME, "Open File...");
 			putValue(MNEMONIC_KEY, new Integer('O'));
 			int mods = demo.getToolkit().getMenuShortcutKeyMask();
 			KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_O, mods);
@@ -145,22 +145,18 @@ interface Actions {
 		}
 
 	}
-
-	/**
-	 * Lets the user open a file.
-	 */
+	
 	static class SaveAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
 
 		private ThingMLRootPane rootPane;
-		private JFileChooser chooser;
 
 		public SaveAction(ThingMLRootPane demo, ImageIcon icon) {
 			super(null, icon);
 			this.rootPane = demo;
 			if (icon == null)
-				putValue(NAME, "Save...");
+				putValue(NAME, "Save");
 			putValue(MNEMONIC_KEY, new Integer('S'));
 			int mods = demo.getToolkit().getMenuShortcutKeyMask();
 			KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_S, mods);
@@ -169,14 +165,34 @@ interface Actions {
 
 		public void actionPerformed(ActionEvent event) {
 			// TODO: Save actions, see list below
+			// auto save every few minutes or for each compile
+			rootPane.saveFile(rootPane.getSelectedTabIndex());
+		}
+	}
+
+	static class SaveAsAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		private ThingMLRootPane rootPane;
+		private JFileChooser chooser;
+
+		public SaveAsAction(ThingMLRootPane demo, ImageIcon icon) {
+			super(null, icon);
+			this.rootPane = demo;
+			if (icon == null)
+				putValue(NAME, "Save As...");
+		}
+
+		public void actionPerformed(ActionEvent event) {
+			// TODO: Save As actions, see list below
 			// Add .thingml if missing
 			// Update properties file
-			// Save on exit
-			// auto save every few minutes or for each compile
 			if (chooser == null) {
 				chooser = new JFileChooser();
 				chooser.setFileFilter(new ExtensionFileFilter(
 						"ThingML Source Files", "thingml"));
+				chooser.setDialogTitle("Save as...");
 			}
 
 			int rc = chooser.showSaveDialog(rootPane);
@@ -185,19 +201,13 @@ interface Actions {
 					// Create file
 					String filename = chooser.getSelectedFile()
 							.getCanonicalPath();
-					rootPane.setCurrentFilePath(filename);
-					rootPane.setTabTitle(chooser.getSelectedFile().getName());
-					FileWriter fstream = new FileWriter(filename);
-					BufferedWriter out = new BufferedWriter(fstream);
-					out.write(rootPane.getCurrentTextArea().getText());
-					// Close the output stream
-					out.close();
+					rootPane.saveAsFile(filename, chooser.getSelectedFile()
+							.getName());
 				} catch (Exception e) {// Catch exception if any
 					System.err.println("Error: " + e.getMessage());
 				}
 			}
 		}
-
 	}
 
 	/**

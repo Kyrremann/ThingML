@@ -19,8 +19,10 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -106,19 +108,17 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	private AutoCompletion autoCodeCompletion;
 	private JLabel statusLabel, cursorLabel;
 	private JTabbedPane tabbedPane;
-	private List<RSyntaxTextArea> textAreas;
-	private List<Properties> properties;
 
 	private JCheckBoxMenuItem cellRenderingItem;
 	private JCheckBoxMenuItem showDescWindowItem;
 	private JCheckBoxMenuItem paramAssistanceItem;
 
-	private int selectedTextArea;
-
-	private String currentFilePath;
+	private List<RSyntaxTextArea> textAreas;
+	private List<Properties> properties;
+	private String arduinoPath;
 	private String configFileName;
 	private String propertiesPath;
-	private String arduinoPath;
+	private List<String> filePaths;
 
 	public ThingMLRootPane() {
 		this(null);
@@ -133,7 +133,8 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		TokenMakerFactory.setDefaultInstance(atmf);
 		textAreas = new ArrayList<RSyntaxTextArea>();
 		properties = new ArrayList<Properties>();
-		
+		filePaths = new ArrayList<String>();
+
 		tabbedPane = new JTabbedPane();
 		tabbedPane.addChangeListener(new ChangeListener() {
 
@@ -144,8 +145,6 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 				refreshSourceTree();
 			}
 		});
-
-		currentFilePath = "http://www.ThingML.org/";
 
 		JTree dummy = new JTree((TreeNode) null);
 		treeSP = new JScrollPane(dummy);
@@ -212,7 +211,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	}
 
 	public RSyntaxTextArea getCurrentTextArea() {
-		return textAreas.get(selectedTextArea);
+		return textAreas.get(getSelectedTabIndex());
 	}
 
 	/**
@@ -381,6 +380,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		menu.add(new JMenuItem(new NewFileAction(this, null)));
 		menu.add(new JMenuItem(new OpenAction(this, null)));
 		menu.add(new JMenuItem(new SaveAction(this, null)));
+		menu.add(new JMenuItem(new SaveAsAction(this, null)));
 		menu.add(new JMenuItem(new ProjectAction(this)));
 
 		menu.addSeparator();
@@ -505,7 +505,9 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
-			ProjectDialog dialog = new ProjectDialog((ThingMLApp) SwingUtilities.getWindowAncestor(rootPane), getCurrentProperties());
+			ProjectDialog dialog = new ProjectDialog(
+					(ThingMLApp) SwingUtilities.getWindowAncestor(rootPane),
+					getCurrentProperties());
 			dialog.setLocationRelativeTo(rootPane);
 			dialog.setVisible(true);
 		}
@@ -524,6 +526,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
+			// TODO Closing last tab cause problems
 			if (tabbedPane.getComponentCount() > 1) {
 				textAreas.remove(tabbedPane.getSelectedIndex());
 				properties.remove(tabbedPane.getSelectedIndex());
@@ -656,7 +659,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		ThingMLModel model = (ThingMLModel) resource.getContents().get(0);
 
 		// String arduinoDir = "/home/kyrremann/bin/arduino-0022";
-		//String libdir = arduinoDir + "/lib";
+		// String libdir = arduinoDir + "/lib";
 
 		// TODO: Config file need to be set
 		// System.out.println("Open: " + configFileName);
@@ -665,59 +668,69 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 		// TODO: Maybe I can split this up, since I've already made a model of
 		// the code
-		CGenerator.compileAndRunArduino(model, getArduinoPath(), getArduinoPath() + "/lib");
+		CGenerator.compileAndRunArduino(model, getArduinoPath(),
+				getArduinoPath() + "/lib");
 	}
 
 	public void uninstallSourceTree() {
 		tree.uninstall();
 		tree = null;
 	}
-
-	/**
-	 * @return the codeFileName
-	 */
-	public String getCurrentFilePath() {
-		return currentFilePath;
+	
+	public String getFilePath(int index) {
+		return filePaths.get(index);
 	}
 
-	/**
-	 * @param filePath
-	 *            the codeFileName to set
-	 */
-	public void setCurrentFilePath(String filePath) {
-		this.currentFilePath = filePath;
-	}
-	
-	public Properties getCurrentProperties() {
-		return properties.get(tabbedPane.getSelectedIndex());
-	}
-	
-	public String getPropertiesPath() {
-		return propertiesPath;
-	}
-	
-	public void setPropertiesPath(String propertiesPath) {
-		this.propertiesPath =  propertiesPath;
-	}
-	
 	public String getConfigFilePath() {
 		return configFileName;
 	}
-	
+
+	public String getArduinoPath() {
+		return arduinoPath;
+	}
+
+	public int getSelectedTabIndex() {
+		return tabbedPane.getSelectedIndex();
+	}
+
+	public JTabbedPane getTabbedPane() {
+		return tabbedPane;
+	}
+
+	public Properties getCurrentProperties() {
+		return properties.get(tabbedPane.getSelectedIndex());
+	}
+
+	public String getPropertiesPath() {
+		return propertiesPath;
+	}
+
+	public void setPropertiesPath(String propertiesPath) {
+		this.propertiesPath = propertiesPath;
+	}
+
 	public void setConfigFilePath(String configFileName) {
 		this.configFileName = configFileName;
 	}
 	
-	public String getArduinoPath() {
-		return arduinoPath;
+	public void setFilePath(int index, String path) {
+		filePaths.add(index, path);
 	}
-	
+
 	public void setArduinoPath(String arudino) {
 		this.arduinoPath = arudino;
 	}
-	
+
 	public void setTabTitle(String title) {
 		tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), title);
+	}
+	
+	public boolean addFilePath(String path) {
+		return filePaths.add(path);
+	}
+
+	public void addTabTitle(int index, String title) {
+		tabbedPane.setTitleAt(index, title);
 	}
 
 	public int addTextArea(String title, RSyntaxTextArea rSyntaxTextArea,
@@ -730,7 +743,6 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	}
 
 	public void setFocusedTextArea(int i) {
-		selectedTextArea = i;
 		tabbedPane.setSelectedIndex(i);
 		focusCurrentTextArea();
 	}
@@ -756,7 +768,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 			rSyntaxTextArea.setText(fileContents.toString());
 			rSyntaxTextArea.setSyntaxEditingStyle(SYNTAX_STYLE_THINGML);
 			rSyntaxTextArea.setCaretPosition(0);
-			setCurrentFilePath(file.getCanonicalPath());
+			addFilePath(file.getCanonicalPath());
 			if (treeSP != null)
 				refreshSourceTree();
 		} catch (IOException ioe) {
@@ -770,23 +782,60 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		RSyntaxTextArea rSyntaxTextArea = createAndAddTextArea("Untitle", null);
 		rSyntaxTextArea.setSyntaxEditingStyle(SYNTAX_STYLE_THINGML);
 		rSyntaxTextArea.setCaretPosition(0);
-		setCurrentFilePath(null);
+		addFilePath(null);
 		properties.add(new Properties());
 		if (treeSP != null)
 			refreshSourceTree();
 	}
-	
+
 	private void loadProperties(int index) {
 		try {
-		Properties prop = this.properties.get(index);
-		setConfigFilePath(prop.getProperty("config", ""));
-		setArduinoPath(prop.getProperty("arduino", ""));
+			Properties prop = this.properties.get(index);
+			setConfigFilePath(prop.getProperty("config", ""));
+			setArduinoPath(prop.getProperty("arduino", ""));
 		} catch (IndexOutOfBoundsException e) {
-			
+
 		}
 	}
-	
+
 	public void putProperties(Properties properties) {
 		this.properties.add(properties);
+	}
+
+	public void saveTabs() {
+		// TODO: Do some saving of all the tabs here
+	}
+
+	public void saveFile(int index) {
+		String path = getFilePath(index);
+		if (path == null) {
+			new SaveAsAction(this, null).actionPerformed(null);
+			return;
+		}
+			
+		try {
+			FileWriter fstream = new FileWriter(path);
+			BufferedWriter out = new BufferedWriter(fstream);
+			out.write(getCurrentTextArea().getText());
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void saveAsFile(String filePath, String fileName) {
+		int tab = tabbedPane.getSelectedIndex();
+		FileWriter fstream;
+		try {
+			// TODO: addCurrentFilePath(tab, filePath);
+			addTabTitle(tab, fileName);
+			setFilePath(tab, filePath);
+			fstream = new FileWriter(filePath);
+			BufferedWriter out = new BufferedWriter(fstream);
+			out.write(getCurrentTextArea().getText());
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 }
