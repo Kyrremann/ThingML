@@ -100,7 +100,7 @@ public class ThingMLParser extends AbstractParser {
 	}
 
 	public ParseResult parse(RSyntaxDocument document, String arg1) {
-
+		
 		// Register the generated package and the XMI Factory
 		EPackage.Registry.INSTANCE.put(ThingmlPackage.eNS_URI,
 				ThingmlPackage.eINSTANCE);
@@ -116,6 +116,7 @@ public class ThingMLParser extends AbstractParser {
 			start = System.currentTimeMillis();
 			resource = null;
 			// System.out.println("Filepath: " + getCurrentFilePath());
+			// TODO: Guess I forgot that I was working here
 			String file = "/home/kyrremann/workspace/fork/ThingML/org.thingml.editor.rsyntaxtext/src/main/resources/samples/samples/_arduino/blink.thingml";
 			resource = new ThingmlResource(URI.createFileURI(file));
 

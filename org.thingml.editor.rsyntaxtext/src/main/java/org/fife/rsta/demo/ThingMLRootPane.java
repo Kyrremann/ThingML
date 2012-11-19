@@ -19,6 +19,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -63,6 +64,8 @@ import javax.swing.event.CaretEvent;
 import javax.swing.event.CaretListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkListener;
 import javax.swing.text.DefaultEditorKit;
@@ -310,6 +313,27 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 			public void caretUpdate(CaretEvent event) {
 				setStatusline(0, event.getDot());
+			}
+		});
+
+		textArea.getDocument().addDocumentListener(new DocumentListener() {
+
+			public void removeUpdate(DocumentEvent e) {
+			}
+
+			public void insertUpdate(DocumentEvent e) {
+			}
+
+			int saveCount = 0;
+
+			public void changedUpdate(DocumentEvent e) {
+				if (saveCount == 30) {
+					saveFile();
+					saveCount = 0;
+				} else
+					saveCount++;
+
+				addSaveStateToTitle(getSelectedTabIndex());
 			}
 		});
 		textArea.setCaretPosition(0);
@@ -676,7 +700,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		tree.uninstall();
 		tree = null;
 	}
-	
+
 	public String getFilePath(int index) {
 		return filePaths.get(index);
 	}
@@ -704,6 +728,14 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	public String getPropertiesPath() {
 		return propertiesPath;
 	}
+	
+	public String getTabTitle() {
+		return getTabbedPane().getTitleAt(getSelectedTabIndex());
+	}
+	
+	public String getTabTitle(int index) {
+		return getTabbedPane().getTitleAt(index);
+	}
 
 	public void setPropertiesPath(String propertiesPath) {
 		this.propertiesPath = propertiesPath;
@@ -712,7 +744,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	public void setConfigFilePath(String configFileName) {
 		this.configFileName = configFileName;
 	}
-	
+
 	public void setFilePath(int index, String path) {
 		filePaths.add(index, path);
 	}
@@ -724,7 +756,18 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	public void setTabTitle(String title) {
 		tabbedPane.setTitleAt(tabbedPane.getSelectedIndex(), title);
 	}
-	
+
+	public void setFocusedTextArea(int i) {
+		tabbedPane.setSelectedIndex(i);
+		focusCurrentTextArea();
+	}
+
+	public void addSaveStateToTitle(int index) {
+		String title = tabbedPane.getTitleAt(index);
+		if (!title.endsWith("*"))
+			tabbedPane.setTitleAt(index, title + "*");
+	}
+
 	public boolean addFilePath(String path) {
 		return filePaths.add(path);
 	}
@@ -742,9 +785,11 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		return textAreas.size() - 1;
 	}
 
-	public void setFocusedTextArea(int i) {
-		tabbedPane.setSelectedIndex(i);
-		focusCurrentTextArea();
+	public void removeSaveStateFromTitle(int index) {
+		String title = tabbedPane.getTitleAt(index);
+		if (title.endsWith("*"))
+			tabbedPane
+					.setTitleAt(index, title.substring(0, title.length() - 1));
 	}
 
 	public void openFile(File file) {
@@ -771,6 +816,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 			addFilePath(file.getCanonicalPath());
 			if (treeSP != null)
 				refreshSourceTree();
+			removeSaveStateFromTitle(getSelectedTabIndex());
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 			UIManager.getLookAndFeel().provideErrorFeedback(this);
@@ -784,6 +830,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		rSyntaxTextArea.setCaretPosition(0);
 		addFilePath(null);
 		properties.add(new Properties());
+		removeSaveStateFromTitle(getSelectedTabIndex());
 		if (treeSP != null)
 			refreshSourceTree();
 	}
@@ -803,39 +850,56 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	}
 
 	public void saveTabs() {
-		// TODO: Do some saving of all the tabs here
+		for (int i = 0; i < getTabbedPane().getComponentCount(); i++) {
+			if (!getTabTitle().equals("Untitle"))
+				saveFile(i);
+		}
+	}
+
+	public void saveFile() {
+		saveFile(getSelectedTabIndex());
 	}
 
 	public void saveFile(int index) {
-		String path = getFilePath(index);
+		final String path = getFilePath(index);
 		if (path == null) {
 			new SaveAsAction(this, null).actionPerformed(null);
 			return;
 		}
-			
-		try {
-			FileWriter fstream = new FileWriter(path);
-			BufferedWriter out = new BufferedWriter(fstream);
-			out.write(getCurrentTextArea().getText());
-			out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		new Thread(new Runnable() {
+
+			public void run() {
+				try {
+					FileWriter fstream = new FileWriter(path);
+					BufferedWriter out = new BufferedWriter(fstream);
+					out.write(getCurrentTextArea().getText());
+					out.close();
+					removeSaveStateFromTitle(getSelectedTabIndex());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
 	}
 
-	public void saveAsFile(String filePath, String fileName) {
-		int tab = tabbedPane.getSelectedIndex();
-		FileWriter fstream;
-		try {
-			// TODO: addCurrentFilePath(tab, filePath);
-			addTabTitle(tab, fileName);
-			setFilePath(tab, filePath);
-			fstream = new FileWriter(filePath);
-			BufferedWriter out = new BufferedWriter(fstream);
-			out.write(getCurrentTextArea().getText());
-			out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public void saveAsFile(final String filePath, final String fileName) {
+		new Thread(new Runnable() {
+
+			public void run() {
+				try {
+					// TODO: addCurrentFilePath(tab, filePath);
+					int tab = tabbedPane.getSelectedIndex();
+					addTabTitle(tab, fileName);
+					setFilePath(tab, filePath);
+					FileWriter fstream = new FileWriter(filePath);
+					BufferedWriter out = new BufferedWriter(fstream);
+					out.write(getCurrentTextArea().getText());
+					out.close();
+					removeSaveStateFromTitle(getSelectedTabIndex());
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}).start();
 	}
 }

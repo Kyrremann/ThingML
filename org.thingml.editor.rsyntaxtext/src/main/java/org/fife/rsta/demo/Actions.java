@@ -17,10 +17,8 @@ package org.fife.rsta.demo;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -145,7 +143,7 @@ interface Actions {
 		}
 
 	}
-	
+
 	static class SaveAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -164,8 +162,6 @@ interface Actions {
 		}
 
 		public void actionPerformed(ActionEvent event) {
-			// TODO: Save actions, see list below
-			// auto save every few minutes or for each compile
 			rootPane.saveFile(rootPane.getSelectedTabIndex());
 		}
 	}
@@ -185,9 +181,6 @@ interface Actions {
 		}
 
 		public void actionPerformed(ActionEvent event) {
-			// TODO: Save As actions, see list below
-			// Add .thingml if missing
-			// Update properties file
 			if (chooser == null) {
 				chooser = new JFileChooser();
 				chooser.setFileFilter(new ExtensionFileFilter(
@@ -198,11 +191,14 @@ interface Actions {
 			int rc = chooser.showSaveDialog(rootPane);
 			if (rc == JFileChooser.APPROVE_OPTION) {
 				try {
-					// Create file
-					String filename = chooser.getSelectedFile()
-							.getCanonicalPath();
-					rootPane.saveAsFile(filename, chooser.getSelectedFile()
-							.getName());
+					String name = chooser.getSelectedFile()
+							.getName();
+					if (!name.matches("\\..+"))					
+					rootPane.saveAsFile(chooser.getSelectedFile()
+							.getCanonicalPath() + ".thingml", name + ".thingml");
+					
+					rootPane.saveAsFile(chooser.getSelectedFile()
+							.getCanonicalPath(), name);
 				} catch (Exception e) {// Catch exception if any
 					System.err.println("Error: " + e.getMessage());
 				}
@@ -238,34 +234,6 @@ interface Actions {
 				ex.printStackTrace();
 			}
 		}
-	}
-
-	/**
-	 * Changes the language being edited and installs appropriate language
-	 * support.
-	 */
-	static class StyleAction extends AbstractAction {
-
-		/**
-		 * 
-		 */
-		private static final long serialVersionUID = 1L;
-		private ThingMLRootPane rootPane;
-		private String res;
-		private String style;
-
-		public StyleAction(ThingMLRootPane rootPane, String name, String res,
-				String style) {
-			putValue(NAME, name);
-			this.rootPane = rootPane;
-			this.res = res;
-			this.style = style;
-		}
-
-		public void actionPerformed(ActionEvent e) {
-			// rootPane.setText(res, style);
-		}
-
 	}
 
 	/**

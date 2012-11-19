@@ -34,6 +34,7 @@ public class ProjectDialog extends JDialog {
 		setResizable(false);
 		// TODO: Enable saving and browsing for the correct files and
 		// directories.
+		// Update properties file
 
 		jPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints bagConstraints = new GridBagConstraints();
