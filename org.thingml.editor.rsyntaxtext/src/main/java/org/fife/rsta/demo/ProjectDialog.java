@@ -17,12 +17,18 @@ package org.fife.rsta.demo;
 
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Properties;
 
+import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+
+import org.fife.rsta.demo.Actions.BrowseFileAction;
+import org.fife.rsta.demo.Actions.BrowseDirAction;
 
 public class ProjectDialog extends JDialog {
 
@@ -34,7 +40,7 @@ public class ProjectDialog extends JDialog {
 		setResizable(false);
 		// TODO: Enable saving and browsing for the correct files and
 		// directories.
-		// Update properties file
+		// Update properties fileS
 
 		jPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints bagConstraints = new GridBagConstraints();
@@ -69,9 +75,29 @@ public class ProjectDialog extends JDialog {
 		bagConstraints.gridy = 2;
 		jPanel.add(thingMLPath, bagConstraints);
 
+		bagConstraints.gridx = 2;
+		JButton button = new JButton(new BrowseFileAction(this, configPath));
+		bagConstraints.gridy = 0;
+		jPanel.add(button, bagConstraints);
+
+		button = new JButton(new BrowseDirAction(this, arduinoPath));
+		bagConstraints.gridy = 1;
+		jPanel.add(button, bagConstraints);
+
+		button = new JButton(new BrowseDirAction(this, thingMLPath));
+		bagConstraints.gridy = 2;
+		jPanel.add(button, bagConstraints);
+
 		setContentPane(jPanel);
 		setTitle("ThingML Project File");
 		setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		addWindowListener(new WindowAdapter() {
+
+			public void windowClosing(WindowEvent we) {
+				// TODO: Save properties
+				System.exit(0);
+			}
+		});
 		pack();
 	}
 }

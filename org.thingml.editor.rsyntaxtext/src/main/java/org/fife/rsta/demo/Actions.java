@@ -25,6 +25,7 @@ import java.util.Properties;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -115,12 +116,74 @@ interface Actions {
 				rootPane.openFile(chooser.getSelectedFile());
 			}
 		}
+	}
+	
+	static class BrowseFileAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		private JFileChooser chooser;
+		private ProjectDialog projectDialog;
+		private JTextField textField;
+
+		public BrowseFileAction(ProjectDialog projectDialog, JTextField textField) {
+			super(null);
+			this.projectDialog = projectDialog;
+			this.textField = textField;
+			putValue("NAME", "Browse for file...");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			if (chooser == null) {
+				chooser = new JFileChooser();
+				chooser.setFileFilter(new ExtensionFileFilter(
+						"ThingML Source Files", "thingml"));
+			}
+			int rc = chooser.showOpenDialog(projectDialog);
+			if (rc == JFileChooser.APPROVE_OPTION) {
+				try {
+					textField.setText(chooser.getSelectedFile().getCanonicalPath());
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
+
+	}
+	
+	static class BrowseDirAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		private JFileChooser chooser;
+		private ProjectDialog projectDialog;
+		private JTextField textField;
+
+		public BrowseDirAction(ProjectDialog projectDialog, JTextField textField) {
+			super(null);
+			this.projectDialog = projectDialog;
+			this.textField = textField;
+			putValue("NAME", "Browse for directory...");
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			if (chooser == null) {
+				chooser = new JFileChooser();
+				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+			}
+			
+			int rc = chooser.showOpenDialog(projectDialog);
+			if (rc == JFileChooser.APPROVE_OPTION) {
+				try {
+					textField.setText(chooser.getSelectedFile().getCanonicalPath());
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		}
 
 	}
 
-	/**
-	 * Lets the user open a file.
-	 */
 	static class NewFileAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
