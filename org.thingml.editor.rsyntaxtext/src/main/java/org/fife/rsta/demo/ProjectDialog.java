@@ -35,37 +35,34 @@ public class ProjectDialog extends JDialog {
 	private static final long serialVersionUID = 7979467489948854312L;
 	private JPanel jPanel;
 
-	public ProjectDialog(ThingMLApp parent, Properties properties) {
+	public ProjectDialog(ThingMLApp parent, final Properties properties) {
 		super(parent);
 		setResizable(false);
-		// TODO: Enable saving and browsing for the correct files and
-		// directories.
-		// Update properties fileS
 
 		jPanel = new JPanel(new GridBagLayout());
 		GridBagConstraints bagConstraints = new GridBagConstraints();
 
 		bagConstraints.gridx = 0;
-		JLabel config = new JLabel("Configuration file: ");
+		JLabel label = new JLabel("Configuration file: ");
 		bagConstraints.gridy = 0;
-		jPanel.add(config, bagConstraints);
+		jPanel.add(label, bagConstraints);
 
-		JLabel arduino = new JLabel("Arduino dir: ");
+		label = new JLabel("Arduino dir: ");
 		bagConstraints.gridy = 1;
-		jPanel.add(arduino, bagConstraints);
+		jPanel.add(label, bagConstraints);
 
-		JLabel thingML = new JLabel("ThingML dir: ");
+		label = new JLabel("ThingML dir: ");
 		bagConstraints.gridy = 2;
-		jPanel.add(thingML, bagConstraints);
+		jPanel.add(label, bagConstraints);
 
 		bagConstraints.gridx = 1;
 		bagConstraints.fill = GridBagConstraints.HORIZONTAL;
-		JTextField configPath = new JTextField(20);
+		final JTextField configPath = new JTextField(20);
 		configPath.setText(properties.getProperty("config", ""));
 		bagConstraints.gridy = 0;
 		jPanel.add(configPath, bagConstraints);
 
-		JTextField arduinoPath = new JTextField();
+		final JTextField arduinoPath = new JTextField();
 		arduinoPath.setText(properties.getProperty("arduino", ""));
 		bagConstraints.gridy = 1;
 		jPanel.add(arduinoPath, bagConstraints);
@@ -77,14 +74,17 @@ public class ProjectDialog extends JDialog {
 
 		bagConstraints.gridx = 2;
 		JButton button = new JButton(new BrowseFileAction(this, configPath));
+		button.setText("Browse...");
 		bagConstraints.gridy = 0;
 		jPanel.add(button, bagConstraints);
 
 		button = new JButton(new BrowseDirAction(this, arduinoPath));
+		button.setText("Browse...");
 		bagConstraints.gridy = 1;
 		jPanel.add(button, bagConstraints);
 
 		button = new JButton(new BrowseDirAction(this, thingMLPath));
+		button.setText("Browse...");
 		bagConstraints.gridy = 2;
 		jPanel.add(button, bagConstraints);
 
@@ -94,8 +94,8 @@ public class ProjectDialog extends JDialog {
 		addWindowListener(new WindowAdapter() {
 
 			public void windowClosing(WindowEvent we) {
-				// TODO: Save properties
-				System.exit(0);
+				properties.put("config", configPath.getText());
+				properties.put("arduino", arduinoPath.getText());
 			}
 		});
 		pack();
