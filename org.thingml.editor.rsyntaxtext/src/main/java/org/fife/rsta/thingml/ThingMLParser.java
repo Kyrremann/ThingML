@@ -100,7 +100,7 @@ public class ThingMLParser extends AbstractParser {
 	}
 
 	public ParseResult parse(RSyntaxDocument document, String arg1) {
-		
+
 		// Register the generated package and the XMI Factory
 		EPackage.Registry.INSTANCE.put(ThingmlPackage.eNS_URI,
 				ThingmlPackage.eINSTANCE);
@@ -117,7 +117,11 @@ public class ThingMLParser extends AbstractParser {
 			resource = null;
 			// System.out.println("Filepath: " + getCurrentFilePath());
 			// TODO: Guess I forgot that I was working here
-			String file = "/home/kyrremann/workspace/fork/ThingML/org.thingml.editor.rsyntaxtext/src/main/resources/samples/samples/_arduino/blink.thingml";
+			// String file =
+			// "/home/kyrremann/workspace/fork/ThingML/org.thingml.editor.rsyntaxtext/src/main/resources/samples/samples/_arduino/blink.thingml";
+			// TODO: This one need to be the file that is supposed to be parsed!
+			// Has nothing to do with compiling
+			String file = getCurrentFilePath();
 			resource = new ThingmlResource(URI.createFileURI(file));
 
 			ResourceSetImpl resourceSetImpl = new ResourceSetImpl();
@@ -154,7 +158,7 @@ public class ThingMLParser extends AbstractParser {
 				// diagnostic.getMessage());
 				DefaultParserNotice notice = new DefaultParserNotice(this,
 						diagnostic.getMessage(), diagnostic.getLine(), offset,
-						5);
+						getLength(diagnostic.getMessage()));
 				result.addNotice(notice);
 			}
 
@@ -195,7 +199,13 @@ public class ThingMLParser extends AbstractParser {
 	public int getLength(String message) {
 		// TODO: Not a proper way to find the length
 		// return message.split("\"")[1].split(" ")[0].length();
-		return message.length();
+		System.out.printf("Message: %s\n", message);
+		for (String s : message.split(" "))
+			System.out.print(s + ", ");
+		
+		String[] array = message.split(" ");
+		return array[array.length - 1].length();
+//		return message.length();
 	}
 
 	public void setFilePath(String currentFilePath) {

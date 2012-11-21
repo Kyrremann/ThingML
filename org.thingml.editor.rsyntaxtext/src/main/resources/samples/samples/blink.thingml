@@ -4,7 +4,7 @@ thing Blink includes LedMsgs, TimerMsgs
 {
 	required port HW 
     {	
-    	sends led_toggle, timer_start
+		sends led_toggle, timer_start
         receives timer_timeout
 	}
 

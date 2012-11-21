@@ -127,6 +127,10 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		this(null);
 	}
 
+	// TODO: Move all Actions to action file
+	// TODO: Make closing program more save, thinking about when you need to
+	// save and press X
+
 	public ThingMLRootPane(CompletionProvider provider) {
 
 		AbstractTokenMakerFactory atmf = (AbstractTokenMakerFactory) TokenMakerFactory
@@ -539,6 +543,8 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 	private class CloseTab extends AbstractAction {
 
+		// TODO: Check if tab is saved!
+
 		private static final long serialVersionUID = -7124045554769969122L;
 
 		public CloseTab() {
@@ -728,11 +734,11 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	public String getPropertiesPath() {
 		return propertiesPath;
 	}
-	
+
 	public String getTabTitle() {
 		return getTabbedPane().getTitleAt(getSelectedTabIndex());
 	}
-	
+
 	public String getTabTitle(int index) {
 		return getTabbedPane().getTitleAt(index);
 	}
@@ -746,6 +752,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	}
 
 	public void setFilePath(int index, String path) {
+		((ThingMLParser) getCurrentTextArea().getParser(1)).setFilePath(path);
 		filePaths.add(index, path);
 	}
 
@@ -769,6 +776,9 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	}
 
 	public boolean addFilePath(String path) {
+		// System.out.printf("Text: %s\nParser: %s\n", getCurrentTextArea(),
+		// getCurrentTextArea().getParser(1));
+		((ThingMLParser) getCurrentTextArea().getParser(1)).setFilePath(path);
 		return filePaths.add(path);
 	}
 
@@ -851,8 +861,10 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 	public void saveTabs() {
 		for (int i = 0; i < getTabbedPane().getComponentCount(); i++) {
-			if (!getTabTitle().equals("Untitle"))
+			if (getTabTitle().endsWith("*")) {
+				setFocusedTextArea(i);
 				saveFile(i);
+			}
 		}
 	}
 
@@ -862,6 +874,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 	public void saveFile(int index) {
 		final String path = getFilePath(index);
+		// TODO: Something is wrong here, both with title name and dialog name
 		if (path == null) {
 			new SaveAsAction(this, null).actionPerformed(null);
 			return;
