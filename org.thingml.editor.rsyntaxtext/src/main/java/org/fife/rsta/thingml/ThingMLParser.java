@@ -135,8 +135,11 @@ public class ThingMLParser extends AbstractParser {
 			if (!resource.getErrors().isEmpty())
 				throw new ParseException("", -1);
 
-			// TODO: Major problem, seems to only work on full paths :\
-			EcoreUtil.resolveAll(resource);
+			try {
+				EcoreUtil.resolveAll(resource);
+			} catch (NullPointerException e) {
+				System.out.println("Getting those exception...");
+			}
 
 			// System.out.println("Errors size: " +
 			// resource.getErrors().size());
@@ -202,10 +205,10 @@ public class ThingMLParser extends AbstractParser {
 		System.out.printf("Message: %s\n", message);
 		for (String s : message.split(" "))
 			System.out.print(s + ", ");
-		
+
 		String[] array = message.split(" ");
 		return array[array.length - 1].length();
-//		return message.length();
+		// return message.length();
 	}
 
 	public void setFilePath(String currentFilePath) {

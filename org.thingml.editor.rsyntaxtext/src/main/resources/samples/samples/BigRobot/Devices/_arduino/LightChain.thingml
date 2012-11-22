@@ -1,0 +1,42 @@
+import "../LightChain.thingml"
+import "../../../../../hardware/io/_arduino/pwm_output.thingml"
+import "../../../../../hardware/io/_arduino/digital_output.thingml"
+import "../../../../../core/_arduino/timer.thingml"
+
+configuration fragment LightChain{
+	instance lightChain : LightChain
+
+	group pwmG : PwmOutputArduino
+	set pwmG.pwm.pin = PWMPin:PWM_PIN_9
+	connector lightChain.PwmG => pwmG.pwm.Pwm
+	
+	group pwmB : PwmOutputArduino
+	set pwmB.pwm.pin = PWMPin:PWM_PIN_10
+	connector lightChain.PwmB => pwmB.pwm.Pwm
+	
+	group g1 : DigitalOutputArduino
+	set g1.digital_output.pin = DigitalPin:PIN_9
+	connector lightChain.DigG => g1.digital_output.DigitalOutput
+	
+	group b1 : DigitalOutputArduino
+	set b1.digital_output.pin = DigitalPin:PIN_10
+	connector lightChain.DigB => b1.digital_output.DigitalOutput
+	
+	group cf : DigitalOutputArduino
+	set cf.digital_output.pin = DigitalPin:A_2
+	connector lightChain.CrazyF => cf.digital_output.DigitalOutput
+	
+	group cs : DigitalOutputArduino
+	set cs.digital_output.pin = DigitalPin:A_3
+	connector lightChain.CrazyS => cs.digital_output.DigitalOutput
+	
+	instance timer : TimerArduino
+	connector lightChain.TimerPwmG => timer.timer
+
+	instance timer2 : TimerArduino
+	connector lightChain.TimerPwmB => timer2.timer
+	instance timer3 : TimerArduino
+	connector lightChain.TimerBlink => timer3.timer
+
+
+}

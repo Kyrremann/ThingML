@@ -1,0 +1,114 @@
+import "../../../thingml.thingml"
+import "../../../hardware/io/pwm_output.thingml"
+import "../../../hardware/io/digital_output.thingml"
+
+
+thing fragment MotorShieldMsgs {
+	message forward_fast();
+	message forward_medium();
+	message forward_slow();
+	message stop();
+	message backwards_fast();
+	message backward_slow();
+	message right();
+	message left();
+	message set_motors_speed(left : Int16, right : Int16);
+
+}
+
+
+thing MotorShield includes MotorShieldMsgs, PwmOutputMsgs, DigitalOutputMsgs{
+
+
+	provided port Motors{
+		receives forward_fast
+		receives forward_medium
+		receives forward_slow
+		receives stop
+		receives backwards_fast
+		receives backward_slow
+		receives right
+		receives left
+        receives set_motors_speed
+	}
+    required port Pwm { //PORT 6
+        sends set_pwm_value
+    }
+    required port Pwm2 { //PORT 5
+        sends set_pwm_value
+    }
+    
+    required port I1 {//PORT 7
+        sends set_digital_output
+    }
+    
+    required port I2 {//PORT 4
+        sends set_digital_output
+    }
+
+ 	property left_speed : Int16 = 0
+	property right_speed : Int16 = 0
+
+	function set_motors(left : Int16, right : Int16) do
+		if (left > -256 and left < 256 and right > -256 and right < 256) do
+			left_speed = left
+			right_speed = right
+			
+			setLeft(left_speed)
+			setRight(right_speed)
+		end
+	end
+	
+	function setLeft(l : Int16)do
+		//'Serial.print("Sets left ");'
+		//'Serial.println('& l &');'
+		if(l == 0)do
+			Pwm!set_pwm_value(0)
+		end
+		if(l > 0)do
+			I1!set_digital_output(DigitalState:LOW)
+			Pwm!set_pwm_value(l)
+		end
+		if(l < 0)do
+			I1!set_digital_output(DigitalState:HIGH)
+			Pwm!set_pwm_value(l*(-1))
+		end
+	end
+	
+	function setRight(r : Int16)do
+		//'Serial.print("Sets right ");'
+		//'Serial.println('& r &');'
+		if(r == 0)do
+			Pwm2!set_pwm_value(0)
+		end
+		if(r > 0)do
+			I2!set_digital_output(DigitalState:LOW)
+			Pwm2!set_pwm_value(r)
+		end
+		if(r < 0)do
+			I2!set_digital_output(DigitalState:HIGH)
+			Pwm2!set_pwm_value(r*(-1))
+		end
+	end
+
+	statechart MotorShieldImpl init BromBrom{
+	
+		state BromBrom{
+		
+			on entry set_motors(0,0)
+			
+			internal event Motors?forward_fast action do set_motors(255, 255) //'Serial.println("I MOTOR RUN");' 
+			end
+			internal event Motors?forward_medium action set_motors(150, 150)
+			internal event Motors?forward_slow action set_motors(107, 107)
+			internal event Motors?stop action set_motors(0,0)
+			internal event Motors?backwards_fast action set_motors(-255, -255)
+			internal event Motors?backward_slow action set_motors(-127, -127)
+			internal event Motors?right action set_motors(-255, 255)
+			internal event Motors?left action set_motors(255, -255)
+		    internal event m : Motors?set_motors_speed action set_motors(m.left, m.right)
+		
+		}
+	
+	}
+}

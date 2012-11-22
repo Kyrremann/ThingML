@@ -92,7 +92,6 @@ public class ThingMLTree {
 				this.root = new ThingMLTreeNode("ROOT");
 
 			for (ThingMLModel model : impl.getImports()) {
-				// TODO: Nullpointer here
 				if (((ThingMLModelImpl) model).eProxyURI() != null)
 					this.root.add(new ThingMLTreeNode(
 							((ThingMLModelImpl) model).eProxyURI().fragment()
@@ -115,13 +114,11 @@ public class ThingMLTree {
 				findTypeAndAddNode(node, stateMachine);
 			for (Message message : impl.getMessages())
 				findTypeAndAddNode(node, message);
-			// TODO: Thing have more get's
 
 			root.add(node);
 
 		} else if (object instanceof RequiredPort) {
 			RequiredPort impl = (RequiredPort) object;
-			// TODO: Extract name from node
 			node = new ThingMLTreeNode(impl.getName() + ": port");
 			addLocationToNode(node, impl);
 
@@ -132,7 +129,6 @@ public class ThingMLTree {
 				findTypeAndAddNode(node, message, "!");
 			for (Message message : impl.getReceives())
 				findTypeAndAddNode(node, message, "?");
-			// TODO: Got more get's
 
 			root.add(node);
 
@@ -146,7 +142,6 @@ public class ThingMLTree {
 			// impl.getInitial().getName()));
 			for (State state : impl.getSubstate())
 				findTypeAndAddNode(node, state);
-			// TODO: Got alot more get's
 
 			root.add(node);
 
@@ -192,7 +187,6 @@ public class ThingMLTree {
 			for (Event event : impl.getEvent()) {
 				findTypeAndAddNode(node, event);
 			}
-			// TODO: Got a lot more get's
 
 			root.add(node);
 
@@ -202,7 +196,6 @@ public class ThingMLTree {
 			// impl.getName(), impl.getPort(), impl.getMessage());
 			node = new ThingMLTreeNode("Receive message");
 			addLocationToNode(node, impl);
-			// TODO: Got port and name
 
 			root.add(node);
 
@@ -212,7 +205,6 @@ public class ThingMLTree {
 			node = new ThingMLTreeNode(annotation + " message");
 			// + ((Object) impl).eProxyURI().toString().substring(51));
 			addLocationToNode(node, impl);
-			// TODO: Got some more get's
 
 			root.add(node);
 
@@ -230,7 +222,6 @@ public class ThingMLTree {
 			for (Expression expression : impl.getParameters()) {
 				findTypeAndAddNode(node, expression);
 			}
-			// TODO: got some get's
 
 			addLocationToNode(node, impl);
 
@@ -254,7 +245,6 @@ public class ThingMLTree {
 			PropertyAssign impl = (PropertyAssign) object;
 			node = new ThingMLTreeNode(impl.getName());
 			addLocationToNode(node, impl);
-			// TODO: Got more get's
 
 			root.add(node);
 
@@ -278,7 +268,6 @@ public class ThingMLTree {
 			ConfigInclude impl = (ConfigInclude) object;
 			node = new ThingMLTreeNode(impl.getName() + ": group");
 			addLocationToNode(node, impl);
-			// TODO: Got one getConfig() left
 
 			root.add(node);
 
@@ -320,7 +309,6 @@ public class ThingMLTree {
 			ProvidedPort impl = (ProvidedPort) object;
 			node = new ThingMLTreeNode(impl.getName());
 			addLocationToNode(node, impl);
-			// TODO: Got alot more get's
 
 			root.add(node);
 
@@ -328,7 +316,6 @@ public class ThingMLTree {
 			RequiredPort impl = (RequiredPort) object;
 			node = new ThingMLTreeNode(impl.getName());
 			addLocationToNode(node, impl);
-			// TODO: Got more get's
 
 			root.add(node);
 
@@ -336,7 +323,6 @@ public class ThingMLTree {
 			Instance impl = (Instance) object;
 			node = new ThingMLTreeNode(impl.getName() + ": instance");
 			addLocationToNode(node, impl);
-			// TODO: Got more get's
 
 			root.add(node);
 
@@ -352,7 +338,6 @@ public class ThingMLTree {
 			// impl.getAnnotations(), impl.getIndex(),
 			// impl.getInit(), impl.getInstance(),
 			// impl.getProperty());
-			// TODO: Got more get's
 
 			root.add(node);
 
@@ -373,7 +358,6 @@ public class ThingMLTree {
 			EnumerationLiteral impl = (EnumerationLiteral) object;
 			node = new ThingMLTreeNode(impl.getName());
 			addLocationToNode(node, impl);
-			// TODO: Got more get's
 
 			root.add(node);
 
@@ -381,7 +365,6 @@ public class ThingMLTree {
 			Enumeration impl = (Enumeration) object;
 			node = new ThingMLTreeNode(impl.getName());
 			addLocationToNode(node, impl);
-			// TODO: Got more get's
 
 			root.add(node);
 
@@ -389,7 +372,6 @@ public class ThingMLTree {
 			Property impl = (Property) object;
 			node = new ThingMLTreeNode(impl.getName());
 			addLocationToNode(node, impl);
-			// TODO: Got more get's
 
 			root.add(node);
 
@@ -442,33 +424,12 @@ public class ThingMLTree {
 
 			root.add(node);
 
-		} else if (object instanceof EqualsExpression) {
-			EqualsExpression impl = (EqualsExpression) object;
-			node = new ThingMLTreeNode(impl.getLhs() + " == " + impl.getRhs());
-			addLocationToNode(node, impl);
-
-			root.add(node);
-
-		} else if (object instanceof GreaterExpression) {
-			GreaterExpression impl = (GreaterExpression) object;
-			node = new ThingMLTreeNode(impl.getLhs() + " > " + impl.getRhs());
-			addLocationToNode(node, impl);
-
-			root.add(node);
-
-		} else if (object instanceof OrExpression) {
-			OrExpression impl = (OrExpression) object;
-			node = new ThingMLTreeNode(impl.getLhs() + " || " + impl.getRhs());
-			addLocationToNode(node, impl);
-
-			root.add(node);
-
 		} else if (object instanceof EventReference) {
-			EventReference impl = (EventReference) object;
+			// EventReference impl = (EventReference) object;
 			// TODO: Nullpointer
+			// Create node and add location
 			// System.out.printf("Msg: %s\nParam: %s\n", impl.getMsgRef(),
 			// impl.getParamRef());
-			// TODO: Create node and add location
 
 		} else {
 			System.out.println("Missing node! Node was of type " + object

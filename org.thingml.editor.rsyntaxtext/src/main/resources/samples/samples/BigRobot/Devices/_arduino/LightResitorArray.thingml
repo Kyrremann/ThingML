@@ -1,0 +1,21 @@
+import "../LightResitorArray.thingml"
+
+import "../../../../../hardware/io/_arduino/digital_output.thingml"
+import "../../../../../core/_arduino/timer.thingml"
+configuration fragment LightSensorArray {
+    
+    
+    group io : DigitalOutputArduino
+    group io2 : DigitalOutputArduino
+    
+    instance range : LightArray 
+    connector range.Light1 => io.digital_output.DigitalOutput
+    connector range.Light2 => io2.digital_output.DigitalOutput
+    
+    
+    instance timer : TimerArduino
+	connector range.Timer => timer.timer
+
+    instance timer : TimerArduino
+	connector range.Timer2 => timer.timer
+}

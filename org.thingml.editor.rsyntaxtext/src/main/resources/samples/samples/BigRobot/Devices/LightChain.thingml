@@ -1,0 +1,423 @@
+import "../../../hardware/io/pwm_output.thingml"
+import "../../../hardware/io/digital_output.thingml"
+import "../../../core/timer.thingml"
+
+thing fragment LightChainMsgs{
+	message start_green();
+	message start_blue();
+	message stop_green();
+	message stop_blue();
+	
+	message blink();
+	
+	message fade_blue();
+	message fade_green();
+	
+	message start_crazy();
+	message stop_crazy();
+}
+
+thing LightChain includes LightChainMsgs, PwmOutputMsgs, DigitalOutputMsgs, TimerMsgs{
+
+	provided port Lights{
+		receives start_green
+		receives start_blue
+		receives stop_green
+		receives stop_blue
+		
+		receives blink
+	
+		receives fade_blue
+		receives fade_green
+		
+		receives start_crazy
+		receives stop_crazy
+	}
+
+	 required port PwmG { 
+        sends set_pwm_value
+    }
+    required port PwmB {
+        sends set_pwm_value
+    }
+    
+    required port DigG {
+        sends set_digital_output
+    }
+    
+    required port DigB {
+        sends set_digital_output
+    }
+    
+    required port CrazyF {
+        sends set_digital_output
+    }
+    
+    required port CrazyS {
+        sends set_digital_output
+    }
+
+
+	required port TimerPwmG{
+		sends timer_start
+		receives timer_timeout
+	}
+	required port TimerPwmB{
+		sends timer_start
+		receives timer_timeout
+	}
+	
+	required port TimerBlink{
+		sends timer_start
+		receives timer_timeout
+	}
+	property valB : UInt16 = 0
+	property valG : UInt16 = 0
+	
+	property blinkval : UInt16 = 0
+	
+	statechart LightChainImpl init idle {
+		state idle{
+			transition -> green
+			event Lights?start_green
+			transition -> blue
+			event Lights?start_blue
+			transition -> green_off
+			event Lights?stop_green
+			transition -> blue_off
+			event Lights?stop_blue
+			transition -> blueFade
+			event Lights?fade_blue
+			transition -> greenFade
+			event Lights?fade_green
+			transition -> start_crazy
+			event Lights?start_crazy
+			transition -> crazy_off
+			event Lights?stop_crazy
+			transition -> blink
+			event Lights?blink
+		}
+		state green{
+			on entry DigG!set_digital_output(DigitalState:HIGH)
+			transition -> green
+			event Lights?start_green
+			transition -> blue
+			event Lights?start_blue
+			transition -> green_off
+			event Lights?stop_green
+			transition -> blue_off
+			event Lights?stop_blue
+			transition -> blueFade
+			event Lights?fade_blue
+			transition -> greenFade
+			event Lights?fade_green
+			transition -> start_crazy
+			event Lights?start_crazy
+			transition -> crazy_off
+			event Lights?stop_crazy
+			transition -> blink
+			event Lights?blink
+		}
+		state blue{
+			on entry DigB!set_digital_output(DigitalState:HIGH)
+			transition -> green
+			event Lights?start_green
+			transition -> blue
+			event Lights?start_blue
+			transition -> green_off
+			event Lights?stop_green
+			transition -> blue_off
+			event Lights?stop_blue
+			transition -> blueFade
+			event Lights?fade_blue
+			transition -> greenFade
+			event Lights?fade_green
+			transition -> start_crazy
+			event Lights?start_crazy
+			transition -> crazy_off
+			event Lights?stop_crazy
+			transition -> blink
+			event Lights?blink
+		}
+		
+		state green_off{
+			on entry DigG!set_digital_output(DigitalState:LOW)
+			transition -> green
+			event Lights?start_green
+			transition -> blue
+			event Lights?start_blue
+			transition -> green_off
+			event Lights?stop_green
+			transition -> blue_off
+			event Lights?stop_blue
+			transition -> blueFade
+			event Lights?fade_blue
+			transition -> greenFade
+			event Lights?fade_green
+			transition -> start_crazy
+			event Lights?start_crazy
+			transition -> crazy_off
+			event Lights?stop_crazy
+			transition -> blink
+			event Lights?blink
+		}
+		state blue_off{
+			on entry DigB!set_digital_output(DigitalState:LOW)
+			transition -> green
+			event Lights?start_green
+			transition -> blue
+			event Lights?start_blue
+			transition -> green_off
+			event Lights?stop_green
+			transition -> blue_off
+			event Lights?stop_blue
+			transition -> blueFade
+			event Lights?fade_blue
+			transition -> greenFade
+			event Lights?fade_green
+			transition -> start_crazy
+			event Lights?start_crazy
+			transition -> crazy_off
+			event Lights?stop_crazy
+			transition -> blink
+			event Lights?blink
+		}
+		
+		state greenFade{
+		
+			on entry do
+				//'Serial.print("STARTER LYS");'
+				//'Serial.println('& val &');'
+				TimerPwmG!timer_start(1)
+				valG = valG + 5
+				PwmG!set_pwm_value(valG)
+			end
+			
+
+			
+			transition -> offG
+			event TimerPwmG?timer_timeout
+			guard valG == 255
+			
+			transition -> greenFade
+			event TimerPwmG?timer_timeout 
+			
+			transition -> green
+			event Lights?start_green
+			transition -> blue
+			event Lights?start_blue
+			transition -> green_off
+			event Lights?stop_green
+			transition -> blue_off
+			event Lights?stop_blue
+			transition -> blueFade
+			event Lights?fade_blue
+			transition -> greenFade
+			event Lights?fade_green
+			transition -> start_crazy
+			event Lights?start_crazy
+			transition -> crazy_off
+			event Lights?stop_crazy
+			transition -> blink
+			event Lights?blink
+
+		}
+		state offG{
+			on entry do
+				//'Serial.print("STARTER LYS");'
+				//'Serial.println('& val &');'
+				TimerPwmG!timer_start(1)
+				valG = valG - 5
+				PwmG!set_pwm_value(valG)
+			end
+			
+			transition -> offG
+			event TimerPwmG?timer_timeout
+			guard valG == 0
+			
+			transition -> greenFade
+			event TimerPwmG?timer_timeout 
+			transition -> green
+			event Lights?start_green
+			transition -> blue
+			event Lights?start_blue
+			transition -> green_off
+			event Lights?stop_green
+			transition -> blue_off
+			event Lights?stop_blue
+			transition -> blueFade
+			event Lights?fade_blue
+			transition -> greenFade
+			event Lights?fade_green
+			transition -> start_crazy
+			event Lights?start_crazy
+			transition -> crazy_off
+			event Lights?stop_crazy
+			transition -> blink
+			event Lights?blink
+		
+		}
+		
+		
+		state blueFade{
+			on entry do
+				//'Serial.print("STARTER LYS");'
+				//'Serial.println('& val &');'
+				TimerPwmB!timer_start(2)
+				valB = valB + 5
+				PwmB!set_pwm_value(valB)
+			end
+			transition -> offB
+			event TimerPwmB?timer_timeout
+			guard valB == 255
+			
+			transition -> blueFade
+			event TimerPwmG?timer_timeout 
+			transition -> green
+			event Lights?start_green
+			transition -> blue
+			event Lights?start_blue
+			transition -> green_off
+			event Lights?stop_green
+			transition -> blue_off
+			event Lights?stop_blue
+			transition -> blueFade
+			event Lights?fade_blue
+			transition -> greenFade
+			event Lights?fade_green
+			transition -> start_crazy
+			event Lights?start_crazy
+			transition -> crazy_off
+			event Lights?stop_crazy
+			transition -> blink
+			event Lights?blink
+		}
+		
+		state offB{
+			on entry do
+				//'Serial.print("STARTER LYS");'
+				//'Serial.println('& val &');'
+				TimerPwmB!timer_start(2)
+				valB = valB - 5
+				PwmB!set_pwm_value(valB)
+			end
+
+			transition -> offB
+			event TimerPwmB?timer_timeout
+			guard valB == 0
+			
+			transition -> blueFade
+			event TimerPwmB?timer_timeout 
+			transition -> green
+			event Lights?start_green
+			transition -> blue
+			event Lights?start_blue
+			transition -> green_off
+			event Lights?stop_green
+			transition -> blue_off
+			event Lights?stop_blue
+			transition -> blueFade
+			event Lights?fade_blue
+			transition -> greenFade
+			event Lights?fade_green
+			transition -> start_crazy
+			event Lights?start_crazy
+			transition -> crazy_off
+			event Lights?stop_crazy
+			transition -> blink
+			event Lights?blink
+		
+		}
+		state blink{
+			on entry do
+				TimerBlink!timer_start(500)
+                if(blinkval == 0) do
+                    
+                end
+
+				if(blinkval == 0) do
+					DigB!set_digital_output(DigitalState:HIGH)
+					DigG!set_digital_output(DigitalState:LOW)
+				end
+				
+				if(blinkval == 1) do
+					DigG!set_digital_output(DigitalState:HIGH)
+					DigB!set_digital_output(DigitalState:LOW)
+				end
+			end
+			
+			transition -> blink
+			event TimerBlink?timer_timeout
+			
+			transition -> green
+			event Lights?start_green
+			transition -> blue
+			event Lights?start_blue
+			transition -> green_off
+			event Lights?stop_green
+			transition -> blue_off
+			event Lights?stop_blue
+			transition -> blueFade
+			event Lights?fade_blue
+			transition -> greenFade
+			event Lights?fade_green
+			transition -> start_crazy
+			event Lights?start_crazy
+			transition -> crazy_off
+			event Lights?stop_crazy
+			transition -> blink
+			event Lights?blink
+		
+		}
+		state start_crazy{
+			on entry do
+				CrazyF!set_digital_output(DigitalState:HIGH)
+				CrazyS!set_digital_output(DigitalState:HIGH)
+			end
+			transition -> green
+			event Lights?start_green
+			transition -> blue
+			event Lights?start_blue
+			transition -> green_off
+			event Lights?stop_green
+			transition -> blue_off
+			event Lights?stop_blue
+			transition -> blueFade
+			event Lights?fade_blue
+			transition -> greenFade
+			event Lights?fade_green
+			transition -> start_crazy
+			event Lights?start_crazy
+			transition -> crazy_off
+			event Lights?stop_crazy
+			transition -> blink
+			event Lights?blink
+		
+		}
+		
+		state crazy_off{
+			on entry do
+				CrazyF!set_digital_output(DigitalState:LOW)
+				CrazyS!set_digital_output(DigitalState:LOW)
+			end
+			transition -> green
+			event Lights?start_green
+			transition -> blue
+			event Lights?start_blue
+			transition -> green_off
+			event Lights?stop_green
+			transition -> blue_off
+			event Lights?stop_blue
+			transition -> blueFade
+			event Lights?fade_blue
+			transition -> greenFade
+			event Lights?fade_green
+			transition -> start_crazy
+			event Lights?start_crazy
+			transition -> crazy_off
+			event Lights?stop_crazy
+			transition -> blink
+			event Lights?blink
+		}
+	}
+}

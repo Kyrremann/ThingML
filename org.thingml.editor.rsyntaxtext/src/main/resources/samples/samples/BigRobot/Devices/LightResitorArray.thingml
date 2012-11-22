@@ -1,0 +1,139 @@
+import "../../../hardware/io/digital_output.thingml"
+import "../../../core/timer.thingml"
+
+thing fragment LightArrayMsgs{
+	message forward_dir();	//best route is forward
+	message left_dir(); //best route is left
+	message right_dir(); //best route is right
+	message dont_know_dir(); //simply cant descide where to go
+}
+
+thing LightArray includes LightArrayMsgs,  DigitalOutputMsgs, TimerMsgs //AnalogInputMsgs 
+{
+
+
+	property duration : Int16 = 5
+    property duration2 : Int16 = 5
+	property distance_cm1 : Int16 = 0
+    property distance_cm2 : Int16 = 0
+    
+	required port Light1{
+		 sends set_digital_output 
+
+	}
+	
+	required port Light2{
+        sends set_digital_output
+	}
+
+	provided port Directions{
+		sends forward_dir	//1
+		sends left_dir 		//2
+		sends right_dir		//3
+		sends dont_know_dir //4
+	}
+
+
+    required port Timer{
+        sends timer_start
+        receives timer_timeout    
+    }
+    
+    required port Timer2{
+        sends timer_start
+        receives timer_timeout    
+    }
+
+
+	statechart LightArrayImpl init FindDirection {
+		//property calc : Int16 = 0
+		//property val1 : Int16 = 0
+		//property val2 : Int16 = 0
+		//property dir : Int16 = 4
+		//property temp : Int16 = 0
+        //property bool : Boolean = false
+        //property highest : Int16 = 0
+        //property lowest : Int16 = 0
+        //property sum : Int16 = 0
+        //property quit : Boolean = true
+		state FindDirection {
+	
+        	on entry do
+        
+
+
+                Light1!set_digital_output (DigitalState:LOW)
+	        	'delayMicroseconds(2);' 
+	        	Light1!set_digital_output (DigitalState:HIGH)
+	        	'delayMicroseconds(10);' 
+	        	Light1!set_digital_output (DigitalState:LOW)
+	        	duration = 'pulseIn(3, HIGH, 100*29*2);'
+	        	
+	        	distance_cm1 = duration / 29 / 2 
+
+
+               
+                
+                if (distance_cm1 == distance_cm2 and distance_cm1 == 0) do
+                     Directions!forward_dir()
+                     'Serial.println("FORWARD");'                                  
+                end
+                
+                
+                if(distance_cm2 == 0 and distance_cm1 > 1 and distance_cm1 < 100) do
+                    Directions!left_dir()  
+                    'Serial.println("Left");' 
+                end
+                
+                if(distance_cm1 == 0 and distance_cm2 > 1 and distance_cm2 < 100) do
+                    Directions!right_dir()
+                    'Serial.println("Right");'   
+                end
+                
+                if(distance_cm2 > 1 and distance_cm2 < 100 and distance_cm1 > 1 and distance_cm1 < 100) do
+                    if (distance_cm1 < distance_cm2) do
+                        Directions!left_dir()
+                        'Serial.println("Left 2");'  
+                     end 
+                     if (distance_cm2 > distance_cm1) do
+                        Directions!right_dir() 
+                        'Serial.println("Right 2");' 
+                     end  
+                end
+
+                'Serial.print('& distance_cm1 &');'
+                'Serial.print("     ");'
+                'Serial.println('& distance_cm2 &');'
+                Timer!timer_start(100)
+                
+            end   
+        	
+            transition -> FindDirection
+            event Timer?timer_timeout
+
+		}
+ 
+        region two init read{
+                
+            state read{
+                on entry do
+                    'Serial.println("ww");'
+                    Light2!set_digital_output (DigitalState:LOW)
+    	        	'delayMicroseconds(2);' 
+    	        	Light2!set_digital_output (DigitalState:HIGH)
+    	        	'delayMicroseconds(10);' 
+    	        	Light2!set_digital_output (DigitalState:LOW)
+    	        	duration2 = 'pulseIn(13, LOW, 100*29*2);'
+            	    'Serial.println();'
+    	        	distance_cm2 = duration2 / 29 / 2 
+                    Timer2!timer_start(100)
+                    'Serial.println("44");'
+                end
+                
+                transition -> read
+                event Timer2?timer_timeout
+            
+          }
+	}
+}
+}

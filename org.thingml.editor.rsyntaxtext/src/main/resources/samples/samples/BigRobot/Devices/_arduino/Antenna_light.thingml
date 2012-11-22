@@ -1,0 +1,18 @@
+import "../Antenna_light.thingml"
+import "../../../../../hardware/io/_arduino/pwm_output.thingml"
+import "../../../../../core/_arduino/timer.thingml"
+
+
+configuration AntennaLight {
+	/*
+	instance antennaLight : AntennaLight
+
+	group pwm : PwmOutputArduino
+	set pwm.pwm.pin = PWMPin:PWM_PIN_3
+	connector antennaLight.Out => pwm.pwm.Pwm
+	
+	
+	instance timer : TimerArduino
+	connector antennaLight.TimerPwm => timer.timer
+*/
+}

@@ -1,0 +1,23 @@
+import "../somo-14d.thingml"  
+import"../../../../../hardware/io/_arduino/digital_output.thingml"  
+  
+ configuration fragment SoundSomo{
+
+ 		
+
+   		instance sound : SoundSomo	 
+   		group io : DigitalOutputArduino
+   		set io.digital_output.pin = DigitalPin:PIN_8
+    	connector sound.Data => io.digital_output.DigitalOutput
+    	
+    	group io2 : DigitalOutputArduino
+    	set io2.digital_output.pin = DigitalPin:A_5
+    	connector sound.Reset => io2.digital_output.DigitalOutput
+    	
+    	group io3 : DigitalOutputArduino
+    	set io3.digital_output.pin = DigitalPin:PIN_10
+    	connector sound.Clock => io3.digital_output.DigitalOutput
+    
+		
+    
+}

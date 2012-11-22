@@ -1,0 +1,65 @@
+import "../BigRobot.thingml"
+import "../Devices/_arduino/RangeSensor2.thingml"
+import "../Devices/_arduino/MotorShieldDFduino.thingml"
+import "../Devices/_arduino/somo-14d.thingml"
+import "../../../core/_arduino/timer.thingml"
+import "../Devices/_arduino/LightResitorArray.thingml"
+import "../Devices/_arduino/Bumper.thingml"
+import "../Devices/_arduino/Antenna_light.thingml"
+import "../Devices/_arduino/LightChain.thingml"
+
+configuration BigRobot
+@debug "true"
+{
+	instance app : BigRobot
+
+//    connector app.SendUpdate => app.ReceiveUpdate
+
+
+    group RangeIN :  RangeArduino
+	set RangeIN.io.digital_output.pin = DigitalPin:PIN_11   /// Yellow wire from the supersonic sensor
+	connector app.Robot => RangeIN.range.RangePort
+
+    group motor : DFMOtorShield
+	set motor.i1.digital_output.pin = DigitalPin:PIN_7
+	set motor.i2.digital_output.pin = DigitalPin:PIN_4
+	set motor.pwm.pwm.pin = PWMPin:PWM_PIN_6
+    set motor.pwm2.pwm.pin = PWMPin:PWM_PIN_5
+    
+    connector app.Motor => motor.motorShield.Motors
+    
+    group sounds : SoundSomo
+    connector app.Sounds => sounds.sound.Sounds   
+    set sounds.io.digital_output.pin = DigitalPin:PIN_8
+	set sounds.io2.digital_output.pin = DigitalPin:A_5
+	set sounds.io3.digital_output.pin = DigitalPin:PIN_10
+    
+    
+    instance timer : TimerArduino
+    connector app.Timer => timer.timer
+    
+    group lightSensor : LightSensorArray
+    set lightSensor.io.digital_output.pin = DigitalPin:PIN_1 //FIX
+    set lightSensor.io2.digital_output.pin = DigitalPin:PIN_9
+    
+    connector app.LightIn => lightSensor.range.Directions
+    
+    group bumper : BumperArduino
+    set bumper.in.digital_input.pin = DigitalPin:PIN_2
+    set bumper.in.digital_input.pullup = false
+	connector app.Bumper => bumper.bumper.Bumper
+    
+   // group antenna : AntennaLight
+   // connector app.Antenna => antenna.antennaLight.Antenna
+    
+    group lightChain : LightChain
+  //  set lightChain.pwmG.pwm.pin = PWMPin:PWM_PIN_9
+  //  set lightChain.pwmB.pwm.pin = PWMPin:PWM_PIN_10
+    set lightChain.g1.digital_output.pin = DigitalPin:A_2
+    set lightChain.b1.digital_output.pin = DigitalPin:A_3
+    //set lightChain.cf.digital_output.pin = DigitalPin:A_2
+    //set lightChain.cs.digital_output.pin = DigitalPin:A_3
+    connector app.Light => lightChain.lightChain.Lights
+    
+    
+}

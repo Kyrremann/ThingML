@@ -1,0 +1,222 @@
+import "Devices/RangeSensor2.thingml"
+import "Devices/MotorShieldDFduino.thingml"
+import "Devices/LightResitorArray.thingml"
+import "Devices/somo-14d.thingml"
+import "Devices/Bumper.thingml"
+import "../../core/timer.thingml"
+import "Devices/LightChain.thingml"
+
+thing BigRobot includes RangeMsgs, MotorShieldMsgs, TimerMsgs, LightArrayMsgs, SoundMsgs, BumperMsgs, LightChainMsgs {
+	
+	required port Sounds{
+		sends r2d2
+		sends chrash
+		sends happy
+		sends cranky
+		sends stop_sound
+	}
+	
+	required port Bumper {
+		receives bump
+	}
+	
+	required port LightIn{
+		receives forward_dir
+		receives left_dir
+		receives right_dir
+		receives dont_know_dir
+	}
+	
+	required port Motor {
+		sends forward_fast
+		sends forward_medium
+		sends forward_slow
+		sends stop
+		sends backwards_fast
+		sends backward_slow
+		sends right
+		sends left
+	}
+	
+	required port Timer{
+		sends timer_start
+		receives timer_timeout
+	}
+	
+	required port RangeTimer{
+		sends timer_start
+		receives timer_timeout
+	}
+	required port Robot {
+		sends get_range
+		receives range
+	}
+	
+	required port Light{
+		sends start_green
+		sends start_blue
+		sends stop_green
+		sends stop_blue
+		sends blink
+	}
+	
+	property range : UInt16 = 0
+	
+	statechart BigRobotImpl init idle {
+		state idle {
+			on entry do
+				Timer!timer_start(500)
+				Motor!stop()
+				Sounds!stop_sound()
+			end
+			transition -> forward
+			event Timer?timer_timeout
+		}
+		
+		state forward {
+			on entry do
+				if(range > 100) do
+					Motor!forward_fast()
+					Light!stop_green()
+					Light!stop_blue()
+				end
+				if(range > 60 and range < 100) do
+					Motor!forward_medium()
+					Light!stop_green()
+					Light!start_blue()
+				end
+				if(range < 40 and range > 15) do
+					Motor!forward_slow()
+					Light!stop_blue()
+					Light!start_green()
+				end
+			end
+			on exit do
+				Light!stop_green()
+				Light!stop_blue()
+			end
+			transition -> stop
+			event LightIn?forward_dir
+			guard range < 20
+			transition -> forward
+			event LightIn?forward_dir
+			transition-> stop
+			event LightIn?dont_know_dir
+			transition -> crashed
+			event Bumper?bump
+			transition -> left
+			event LightIn?left_dir
+			transition -> right
+			event LightIn?right_dir
+		}
+		
+		state stop {
+			on entry do
+				Sounds!r2d2 ()
+				if(range < 20) do
+					Motor!stop()
+				end
+			end
+			transition -> stop
+			event LightIn?forward_dir
+			guard range < 15
+			transition -> forward
+			event LightIn?forward_dir
+			transition-> stop
+			event LightIn?dont_know_dir
+			transition -> crashed
+			event Bumper?bump
+			transition -> left
+			event LightIn?left_dir
+			transition -> right
+			event LightIn?right_dir
+		}
+		
+		state left {
+			on entry do
+				Motor!left()
+			end
+			transition -> stop
+			event LightIn?forward_dir
+			guard range < 15
+			transition -> forward
+			event LightIn?forward_dir
+			transition-> stop
+			event LightIn?dont_know_dir
+			transition -> crashed
+			event Bumper?bump
+			transition -> left
+			event LightIn?left_dir
+			transition -> right
+			event LightIn?right_dir
+		}
+		
+		state right {
+			on entry do
+				Motor!right()
+			end
+			transition -> stop
+			event LightIn?forward_dir
+			guard range < 20
+			transition -> forward
+			event LightIn?forward_dir
+			transition-> stop
+			event LightIn?dont_know_dir
+			transition -> crashed
+			event Bumper?bump
+			transition -> left
+			event LightIn?left_dir
+			transition -> right
+			event LightIn?right_dir
+		}
+		
+		state crashed {
+			property time : UInt16 = 0
+			property rand : UInt16 = 0
+			on entry do
+				Sounds!cranky()
+				time = 1000
+				Timer!timer_start(time)
+				Motor!backwards_fast()
+			end
+			internal event Timer?timer_timeout
+			guard time == 1000
+			action do
+				time = 500
+				Timer!timer_start(time)
+				if(rand == 0) do
+					Motor!left()
+				end
+				if (rand == 1) do
+					Motor!right()
+				end
+			end
+			transition -> forward
+			event Timer?timer_timeout
+			guard time == 500
+			action do
+				Motor!stop()
+			end
+		}
+		
+		region Measure init MeasureDistance {
+			state MeasureDistance{
+				on entry do
+					Robot!get_range()
+				end
+				internal event m : Robot?range
+				action do
+					range = m.cm
+					if(range == 0) do
+						range = 100
+					end
+					RangeTimer!timer_start(50)
+				end
+				internal event RangeTimer?timer_timeout
+				action do
+					Robot!get_range()
+				end
+			}
+		}
+	}
+}

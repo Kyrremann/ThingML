@@ -18,11 +18,8 @@ package org.fife.rsta.demo;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -53,7 +50,6 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
-import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
@@ -75,9 +71,7 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EPackage;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
-import org.eclipse.emf.ecore.resource.Resource.Diagnostic;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.fife.rsta.AbstractSourceTree;
 import org.fife.rsta.LanguageSupportFactory;
 import org.fife.rsta.demo.Actions;
@@ -130,6 +124,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	// TODO: Move all Actions to action file
 	// TODO: Make closing program more save, thinking about when you need to
 	// save and press X
+	// TODO: When saving, just one tab is checked, not all :\
 
 	public ThingMLRootPane(CompletionProvider provider) {
 
@@ -417,6 +412,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		examples.add(new JMenuItem(new SampleAction(this, "Blink 2 leds")));
 		examples.add(new JMenuItem(new SampleAction(this, "Blink 4 leds")));
 		examples.add(new JMenuItem(new SampleAction(this, "Blink frequency")));
+		examples.add(new JMenuItem(new SampleAction(this, "Big robot")));
 		menu.add(examples);
 
 		menu.addSeparator();
@@ -425,7 +421,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		mb.add(menu);
 
 		menu = new JMenu("Edit");
-		menu.add(new JMenuItem(new CloseTab()));
+		menu.add(new JMenuItem(new CloseTab(this)));
 		mb.add(menu);
 
 		menu = new JMenu("View");
@@ -515,54 +511,11 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		button.setAction(new ArduinoAction(this, null));
 		toolbar.add(button);
 
+		button = new JButton("Format");
+		button.setAction(new FormatAction(this, null));
+		toolbar.add(button);
+
 		return toolbar;
-	}
-
-	private class ProjectAction extends AbstractAction {
-
-		private static final long serialVersionUID = 6015770944269644342L;
-		private ThingMLRootPane rootPane;
-
-		public ProjectAction(ThingMLRootPane rootPane) {
-			this.rootPane = rootPane;
-			putValue(NAME, "Properties");
-			// putValue(MNEMONIC_KEY, new Integer('W'));
-			// int mods = getToolkit().getMenuShortcutKeyMask();
-			// KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_W, mods);
-			// putValue(ACCELERATOR_KEY, ks);
-		}
-
-		public void actionPerformed(ActionEvent arg0) {
-			ProjectDialog dialog = new ProjectDialog(
-					(ThingMLApp) SwingUtilities.getWindowAncestor(rootPane),
-					getCurrentProperties());
-			dialog.setLocationRelativeTo(rootPane);
-			dialog.setVisible(true);
-		}
-	}
-
-	private class CloseTab extends AbstractAction {
-
-		// TODO: Check if tab is saved!
-
-		private static final long serialVersionUID = -7124045554769969122L;
-
-		public CloseTab() {
-			putValue(NAME, "Close tab");
-			putValue(MNEMONIC_KEY, new Integer('W'));
-			int mods = getToolkit().getMenuShortcutKeyMask();
-			KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_W, mods);
-			putValue(ACCELERATOR_KEY, ks);
-		}
-
-		public void actionPerformed(ActionEvent arg0) {
-			// TODO Closing last tab cause problems
-			if (tabbedPane.getComponentCount() > 1) {
-				textAreas.remove(tabbedPane.getSelectedIndex());
-				properties.remove(tabbedPane.getSelectedIndex());
-				tabbedPane.remove(tabbedPane.getSelectedComponent());
-			}
-		}
 	}
 
 	/**
@@ -735,6 +688,10 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		return propertiesPath;
 	}
 
+	public int getPropertiesSize() {
+		return properties.size();
+	}
+
 	public String getTabTitle() {
 		return getTabbedPane().getTitleAt(getSelectedTabIndex());
 	}
@@ -776,8 +733,6 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	}
 
 	public boolean addFilePath(String path) {
-		// System.out.printf("Text: %s\nParser: %s\n", getCurrentTextArea(),
-		// getCurrentTextArea().getParser(1));
 		((ThingMLParser) getCurrentTextArea().getParser(1)).setFilePath(path);
 		return filePaths.add(path);
 	}
@@ -800,6 +755,61 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		if (title.endsWith("*"))
 			tabbedPane
 					.setTitleAt(index, title.substring(0, title.length() - 1));
+	}
+
+	public RTextArea removeTextArea(int index) {
+		return textAreas.remove(index);
+	}
+
+	public Properties removeProperties(int index) {
+		return properties.remove(index);
+	}
+
+	public void removeTabbedPane(int index) {
+		tabbedPane.removeTabAt(index);
+	}
+
+	private void loadProperties(int index) {
+		try {
+			Properties prop = this.properties.get(index);
+			setConfigFilePath(prop.getProperty("config", ""));
+			setArduinoPath(prop.getProperty("arduino", ""));
+		} catch (IndexOutOfBoundsException e) {
+
+		}
+	}
+
+	public void putProperties(Properties properties) {
+		this.properties.add(properties);
+	}
+
+	public void formatCurrentTextarea() {
+		RTextArea rTextArea = getCurrentTextArea();
+		rTextArea.setText(simpleFormatting(rTextArea.getText()));
+	}
+
+	public String simpleFormatting(String input) {
+		String output = "";
+		int indent = 0;
+		String[] array = input.split("\n");
+		for (int i = 0; i < array.length; i++) {
+			array[i] = array[i].trim();
+
+			if (array[i].contains("}") || array[i].equals("end"))
+				indent--;
+
+			for (int x = 0; x < indent; x++)
+				if (!array[i].contains("\t"))
+					output += "\t";
+
+			// TODO: Stupid java and stupid end of line
+			if (array[i].contains("{") || array[i].matches("^.*do$"))// contains(" do"))
+				indent++;
+
+			output += array[i] + "\n";
+		}
+
+		return output;
 	}
 
 	public void openFile(File file) {
@@ -839,24 +849,12 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		rSyntaxTextArea.setSyntaxEditingStyle(SYNTAX_STYLE_THINGML);
 		rSyntaxTextArea.setCaretPosition(0);
 		addFilePath(null);
-		properties.add(new Properties());
+		System.out.println("Should be 0 -> " + getPropertiesSize());
+		putProperties(new Properties());
+		System.out.println("Should be 1 -> " + getPropertiesSize());
 		removeSaveStateFromTitle(getSelectedTabIndex());
 		if (treeSP != null)
 			refreshSourceTree();
-	}
-
-	private void loadProperties(int index) {
-		try {
-			Properties prop = this.properties.get(index);
-			setConfigFilePath(prop.getProperty("config", ""));
-			setArduinoPath(prop.getProperty("arduino", ""));
-		} catch (IndexOutOfBoundsException e) {
-
-		}
-	}
-
-	public void putProperties(Properties properties) {
-		this.properties.add(properties);
 	}
 
 	public void saveTabs() {

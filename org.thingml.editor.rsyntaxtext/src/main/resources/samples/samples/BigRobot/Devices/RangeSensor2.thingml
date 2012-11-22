@@ -1,0 +1,59 @@
+/*
+	Jan Ole Skotterud
+	This file provides an interface to
+	the range sensor HC-SR04
+*/
+
+
+import "../../../hardware/io/digital_output.thingml"
+
+
+thing fragment RangeMsgs {
+      message get_range();
+      message range(cm : Int16);// returns m.cm, after receiving one should wait about 100 ms before
+      							//calling get_range again, in order to let the sensor settle down
+}
+
+thing Range includes RangeMsgs, DigitalOutputMsgs
+{
+
+	property duration : Int16 = 5
+	property distancne_cm : Int16 = 0
+
+
+    provided port RangePort {
+        receives get_range
+        sends range
+
+    }
+    required port DigitalOutput
+    {
+        sends set_digital_output    
+    }
+
+
+    statechart RangeImpl init Sense
+    {    
+    
+        state Sense 
+        { 
+        	//on entry DigitalInput!read_digital_input()
+        
+        	transition -> Sense
+        	event m : RangePort?get_range
+        	action do
+	        	DigitalOutput!set_digital_output (DigitalState:LOW)
+	        	'delayMicroseconds(2);' 
+	        	DigitalOutput!set_digital_output (DigitalState:HIGH)
+	        	'delayMicroseconds(10);' 
+	        	DigitalOutput!set_digital_output (DigitalState:LOW)
+	        	duration = 'pulseIn(12, HIGH, 100*29*2);'
+	        	
+	        	distancne_cm = duration / 29 / 2 
+                'delay(100);'
+                'Serial.println('& distancne_cm &');'
+        		RangePort!range(distancne_cm)
+        	end   
+        }   
+    }
+}

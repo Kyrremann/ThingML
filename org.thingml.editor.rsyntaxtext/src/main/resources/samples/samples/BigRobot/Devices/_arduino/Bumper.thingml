@@ -1,0 +1,15 @@
+import "../Bumper.thingml"
+
+import "../../../../../hardware/io/_arduino/digital_input.thingml"
+
+configuration fragment BumperArduino {
+
+	instance bumper : Bumper
+
+	group in : OnChangeDigitalInputArduino
+	//set leftin.digital_input.pin = DigitalPin:PIN_3
+	//set leftin.digital_input.pullup = true
+	
+	connector bumper.Sensor => in.change_digital_input.OnChangeDigitalInput
+
+}

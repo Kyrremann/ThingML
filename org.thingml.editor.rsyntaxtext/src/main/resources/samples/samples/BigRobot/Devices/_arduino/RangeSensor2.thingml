@@ -1,0 +1,18 @@
+/*
+	Jan Ole Skotterud
+	This file provides an interface to
+	the range sensor HC-SR04
+*/
+
+import "../RangeSensor2.thingml"
+import "../../../../../hardware/io/_arduino/digital_output.thingml"
+import "../../../../../hardware/io/_arduino/digital_input.thingml"
+
+configuration fragment RangeArduino
+{
+    group io : DigitalOutputArduino
+
+    instance range : Range	 
+    connector range.DigitalOutput => io.digital_output.DigitalOutput
+    
+} 

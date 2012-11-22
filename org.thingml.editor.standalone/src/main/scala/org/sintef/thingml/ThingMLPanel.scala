@@ -320,7 +320,6 @@ class ThingMLPanel extends JPanel {
   menubar.add(compilersMenu)
   
   def loadThingMLmodel(file : File) = {
-  System.out.println(file);
     var rs: ResourceSet = new ResourceSetImpl
     var xmiuri: URI = URI.createFileURI(file.getAbsolutePath)
     var model: Resource = rs.createResource(xmiuri)

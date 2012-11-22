@@ -1,0 +1,33 @@
+import "../../../hardware/io/digital_input.thingml"
+
+thing fragment BumperMsgs {
+    message bump();
+}
+
+
+thing Bumper includes BumperMsgs, DigitalInputMsgs
+{
+	provided port Bumper {
+        sends bump
+    }
+	
+	required port Sensor {
+		receives digital_input_value
+	}
+
+   statechart BumperUCImpl init Active
+	{	
+	
+		
+		
+		state Active{
+			//on entry// 'Serial.println("BUMP");'
+		
+		transition -> Active 
+		event m : Sensor?digital_input_value
+		guard m.value == DigitalState:LOW
+		action Bumper!bump()
+		
+		}
+	}
+}

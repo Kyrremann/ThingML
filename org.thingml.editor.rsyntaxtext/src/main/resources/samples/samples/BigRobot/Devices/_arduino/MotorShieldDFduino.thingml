@@ -1,0 +1,28 @@
+import "../MotorShieldDFduino.thingml"
+
+import "../../../../../hardware/arduino/_arduino/arduino.thingml"
+import "../../../../../hardware/io/_arduino/pwm_output.thingml"
+import "../../../../../hardware/io/_arduino/digital_output.thingml"
+
+
+configuration fragment DFMOtorShield {
+    instance motorShield : MotorShield
+    
+    
+	group i1 : DigitalOutputArduino
+	set i1.digital_output.pin = DigitalPin:PIN_7
+	connector motorShield.I1 => i1.digital_output.DigitalOutput
+	
+	group i2 : DigitalOutputArduino
+	set i2.digital_output.pin = DigitalPin:PIN_4
+	connector motorShield.I2 => i2.digital_output.DigitalOutput
+	
+	group pwm : PwmOutputArduino
+	set pwm.pwm.pin = PWMPin:PWM_PIN_6
+	connector motorShield.Pwm => pwm.pwm.Pwm
+
+	group pwm2 : PwmOutputArduino
+	set pwm2.pwm.pin = PWMPin:PWM_PIN_5
+	connector motorShield.Pwm2 => pwm2.pwm.Pwm
+    
+}

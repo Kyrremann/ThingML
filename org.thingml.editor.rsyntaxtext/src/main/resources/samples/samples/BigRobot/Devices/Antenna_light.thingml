@@ -1,0 +1,66 @@
+import "../../../hardware/io/pwm_output.thingml"
+import "../../../core/timer.thingml"
+
+thing fragment AntennaMsgs{
+	message start();
+}
+
+thing AntennaLight includes PwmOutputMsgs, TimerMsgs, AntennaMsgs{
+
+	provided port Antenna{
+		receives start
+	}
+
+	required port TimerPwm{
+		sends timer_start
+		receives timer_timeout
+	}
+
+	required port Out{
+		sends set_pwm_value
+	}
+
+	property val : UInt16 = 0
+
+	statechart Blinker init online {
+		state online{
+			/*on entry do
+				//'Serial.print("STARTER LYS");'
+				//'Serial.println('& val &');'
+				TimerPwm!timer_start(2)
+				val = val + 5
+				Out!set_pwm_value(val)
+			end
+			
+			transition -> off
+			event TimerPwm?timer_timeout
+			guard val == 255
+			
+			transition -> online
+			event TimerPwm?timer_timeout 
+			
+			internal event Antenna?start
+			action do
+			end*/
+		}
+		
+		state off{
+		/*
+		on entry do
+				//'Serial.print("SLUKKER LYS");'
+				//'Serial.println('& val &');'
+				TimerPwm!timer_start(2)
+				val = val - 5
+				Out!set_pwm_value(val)
+			end
+			
+			transition -> online
+			event TimerPwm?timer_timeout
+			guard val == 0
+			
+			transition -> off
+			event TimerPwm?timer_timeout
+*/ 
+		}
+	}
+}

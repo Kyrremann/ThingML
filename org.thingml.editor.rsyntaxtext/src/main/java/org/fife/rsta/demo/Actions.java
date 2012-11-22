@@ -25,6 +25,7 @@ import java.util.Properties;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -34,6 +35,7 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import org.fife.rsta.demo.AboutDialog;
 import org.fife.rsta.demo.ThingMLRootPane;
 import org.fife.rsta.demo.ExtensionFileFilter;
+import org.fife.rsta.thingml.ThingMLCellRenderer;
 
 /**
  * Container for all actions used by the demo.
@@ -106,7 +108,7 @@ interface Actions {
 
 		public void actionPerformed(ActionEvent e) {
 			if (chooser == null) {
-				chooser = new JFileChooser();
+				chooser = new JFileChooser("./src/main/resources/samples/samples/BigRobot");
 				chooser.setFileFilter(new ExtensionFileFilter(
 						"ThingML Source Files", "thingml"));
 			}
@@ -299,9 +301,6 @@ interface Actions {
 		}
 	}
 
-	/**
-	 * Lets the user open a file.
-	 */
 	static class ArduinoAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -324,10 +323,30 @@ interface Actions {
 		}
 
 	}
+	
+	static class FormatAction extends AbstractAction {
 
-	/**
-	 * Lets the user open a file.
-	 */
+		private static final long serialVersionUID = 1L;
+
+		private ThingMLRootPane demo;
+
+		public FormatAction(ThingMLRootPane demo, ImageIcon icon) {
+			super(null, icon);
+			this.demo = demo;
+			if (icon == null)
+				putValue(NAME, "Format code");
+			putValue(MNEMONIC_KEY, new Integer('F'));
+			int mods = demo.getToolkit().getMenuShortcutKeyMask();
+			KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_F, mods);
+			putValue(ACCELERATOR_KEY, ks);
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			((ThingMLRootPane) demo).formatCurrentTextarea();
+		}
+
+	}
+
 	static class SampleAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -339,14 +358,10 @@ interface Actions {
 			super(title);
 			this.rootPane = rootPane;
 			this.title = title;
-			// putValue(NAME, "ThingML Samples");
-			// putValue(MNEMONIC_KEY, new Integer('A'));
-			// int mods = demo.getToolkit().getMenuShortcutKeyMask();
-			// KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_A, mods);
-			// putValue(ACCELERATOR_KEY, ks);
 		}
 
 		public void actionPerformed(ActionEvent e) {
+			System.out.println("Should be one less then nex -> " + rootPane.getPropertiesSize());
 			if (title.equals("Blink")) {
 				rootPane.openFile(new File(
 						"src/main/resources/samples/samples/blink.thingml"));
@@ -363,7 +378,13 @@ interface Actions {
 				rootPane.openFile(new File(
 						"src/main/resources/samples/samples/blink_freq.thingml"));
 				loadPropertiesAndSetfiles("src/main/resources/samples/samples/blink_freq.properties");
+			} else if (title.equals("Big robot")) {
+				rootPane.openFile(new File(
+						"src/main/resources/samples/samples/BigRobot/BigRobot.thingml"));
+				loadPropertiesAndSetfiles("src/main/resources/samples/samples/BigRobot/BigRobot.properties");
 			}
+
+			System.out.println("This is next -> " + rootPane.getPropertiesSize());
 		}
 
 		private void loadPropertiesAndSetfiles(String name) {
@@ -375,9 +396,56 @@ interface Actions {
 				rootPane.setArduinoPath(properties.getProperty("arduino", ""));
 				rootPane.putProperties(properties);
 			} catch (IOException e) {
+				// TODO: Inform user that file is missing?
 				e.getStackTrace();
 			}
 		}
 	}
+	
+	public class ProjectAction extends AbstractAction {
 
+		private static final long serialVersionUID = 6015770944269644342L;
+		private ThingMLRootPane rootPane;
+
+		public ProjectAction(ThingMLRootPane rootPane) {
+			this.rootPane = rootPane;
+			putValue(NAME, "Properties");
+		}
+
+		public void actionPerformed(ActionEvent arg0) {
+			ProjectDialog dialog = new ProjectDialog(
+					(ThingMLApp) SwingUtilities.getWindowAncestor(rootPane),
+					rootPane.getCurrentProperties());
+			dialog.setLocationRelativeTo(rootPane);
+			dialog.setVisible(true);
+		}
+	}
+
+	public class CloseTab extends AbstractAction {
+
+		// TODO: Check if tab is saved!
+
+		private static final long serialVersionUID = -7124045554769969122L;
+		ThingMLRootPane rootPane;
+
+		public CloseTab(ThingMLRootPane rootPane) {
+			this.rootPane = rootPane;
+			putValue(NAME, "Close tab");
+			putValue(MNEMONIC_KEY, new Integer('W'));
+			int mods = rootPane.getToolkit().getMenuShortcutKeyMask();
+			KeyStroke ks = KeyStroke.getKeyStroke(KeyEvent.VK_W, mods);
+			putValue(ACCELERATOR_KEY, ks);
+		}
+
+		public void actionPerformed(ActionEvent arg0) {
+			// TODO: Need to check if tab is saved before closing it
+			if (rootPane.getTabbedPane().getComponentCount() > 1) {
+				JTabbedPane pane = rootPane.getTabbedPane();
+				int selected = pane.getSelectedIndex();
+				rootPane.removeTextArea(selected);
+				rootPane.removeProperties(selected);
+				rootPane.removeTabbedPane(selected);
+			}
+		}
+	}
 }

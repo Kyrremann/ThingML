@@ -1,0 +1,231 @@
+import "../../../hardware/io/digital_output.thingml"
+
+thing fragment SoundMsgs{
+	message r2d2();
+	message chrash();
+	message happy();
+	message cranky();
+	message set_sound(value : UInt16);
+	message play_set_sound();
+	message stop_sound();
+}
+
+
+thing SoundSomo includes SoundMsgs, DigitalOutputMsgs {
+
+	property stop : UInt16 = 65535
+	property volume : UInt16 = 65527
+	property sound : UInt16 = 0
+	
+	provided port Sounds{
+		receives r2d2
+		receives chrash
+		receives happy
+		receives cranky
+		receives set_sound
+		receives play_set_sound
+		receives stop_sound
+	}
+	
+	required port Clock{
+		sends set_digital_output
+	}
+		required port Data{
+		sends set_digital_output
+	}
+		required port Reset{
+		sends set_digital_output
+	}
+
+	function setCommand(command2 : UInt16) do
+	//'Serial.println("i command");'
+        'pinMode(10, OUTPUT);'
+		'digitalWrite(10, LOW);'
+		'delay(2);'
+		' for (unsigned int mask = 0x8000; mask > 0; mask >>= 1) {
+		    if (command2 & mask) {'
+		    	'digitalWrite(8, HIGH);'
+			'}else{'
+				'digitalWrite(8, LOW);'
+			'}'
+			'digitalWrite(10, LOW);'
+			'delayMicroseconds(200);'
+			'digitalWrite(10, HIGH);'
+			'delayMicroseconds(200);'
+		'}'
+		'delay(2);'
+	end
+	
+	function setSound(s : UInt16) do
+		sound = s
+	end
+
+	statechart SoundImpl init idle {
+			internal event m : Sounds?set_sound
+			action setSound(m.value)
+			
+			
+		state idle {
+		 on entry do
+		 	//'Serial.println("idle");'
+		 	setCommand(volume)
+		 	'digitalWrite(10, HIGH);'
+			'digitalWrite(8, LOW);'
+			'digitalWrite(19, HIGH);'
+			'delay(100);'
+			'digitalWrite(19, LOW);'
+			'delay(10);'
+			'digitalWrite(19, HIGH);'
+			'delay(100);'
+			//'Serial.println("ferdig i idle");'
+		 end 
+		
+		
+			transition -> r2d2
+			event Sounds?r2d2
+			
+			transition -> chrash
+			event Sounds?chrash
+			
+			transition -> cranky
+			event Sounds?cranky
+			
+			transition -> happy
+			event Sounds?happy
+			
+			transition -> stop
+			event Sounds?stop_sound
+			
+			transition -> playCustom
+			event Sounds?play_set_sound
+			
+		}
+		state r2d2 {
+			on entry do setCommand(1) //'Serial.println("r2d2");' 
+			end
+		
+			transition -> r2d2
+			event Sounds?r2d2
+			
+			transition -> chrash
+			event Sounds?chrash
+			
+			transition -> cranky
+			event Sounds?cranky
+			
+			transition -> happy
+			event Sounds?happy
+			
+			transition -> stop
+			event Sounds?stop_sound
+			
+			transition -> playCustom
+			event Sounds?play_set_sound
+		}
+		state chrash {
+		on entry setCommand(2)
+			transition -> r2d2
+			event Sounds?r2d2
+			
+			transition -> chrash
+			event Sounds?chrash
+			
+			transition -> cranky
+			event Sounds?cranky
+			
+			transition -> happy
+			event Sounds?happy
+			
+			transition -> stop
+			event Sounds?stop_sound
+			
+			transition -> playCustom
+			event Sounds?play_set_sound
+		}
+		
+		state cranky{
+		on entry setCommand(3)
+			transition -> r2d2
+			event Sounds?r2d2
+			
+			transition -> chrash
+			event Sounds?chrash
+			
+			transition -> cranky
+			event Sounds?cranky
+			
+			transition -> happy
+			event Sounds?happy
+			
+			transition -> stop
+			event Sounds?stop_sound
+			
+			transition -> playCustom
+			event Sounds?play_set_sound
+		}
+		state happy{
+		on entry setCommand(4)
+			transition -> r2d2
+			event Sounds?r2d2
+			
+			transition -> chrash
+			event Sounds?chrash
+			
+			transition -> cranky
+			event Sounds?cranky
+			
+			transition -> happy
+			event Sounds?happy
+			
+			transition -> stop
+			event Sounds?stop_sound
+			
+			transition -> playCustom
+			event Sounds?play_set_sound
+		}
+		state stop{
+			on entry setCommand(stop)
+		
+			transition -> r2d2
+			event Sounds?r2d2
+			
+			transition -> chrash
+			event Sounds?chrash
+			
+			transition -> cranky
+			event Sounds?cranky
+			
+			transition -> happy
+			event Sounds?happy
+			
+			transition -> stop
+			event Sounds?stop_sound
+			
+			transition -> playCustom
+			event Sounds?play_set_sound
+		}
+		
+		state playCustom {
+			on entry setCommand(sound)
+		
+			transition -> r2d2
+			event Sounds?r2d2
+			
+			transition -> chrash
+			event Sounds?chrash
+			
+			transition -> cranky
+			event Sounds?cranky
+			
+			transition -> happy
+			event Sounds?happy
+			
+			transition -> stop
+			event Sounds?stop_sound
+			
+			transition -> playCustom
+			event Sounds?play_set_sound
+		
+		}
+	}
+}
