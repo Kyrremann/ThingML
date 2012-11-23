@@ -18,12 +18,12 @@ package org.fife.rsta.demo;
 import java.awt.Toolkit;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.io.IOException;
 
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.plaf.SliderUI;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
@@ -36,17 +36,22 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 public class ThingMLApp extends JFrame {
 
 	private static final long serialVersionUID = -3237525402614050486L;
+	private ThingMLRootPane rootPane;
 
 	public ThingMLApp() throws IOException {
 
-		// setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setTitle("RSTA Language Support ThingML Demo Application");
 		setRootPane(new ThingMLRootPane());
+		rootPane = (ThingMLRootPane) getRootPane();
 		addWindowListener(new WindowAdapter() {
 
 			public void windowClosing(WindowEvent we) {
-				((ThingMLRootPane) getRootPane()).saveTabs();
-				System.exit(0);
+				rootPane.setSafeToClose(true);
+				rootPane.saveTabs();
+				
+				if (rootPane.isSafeToClose())
+					dispose();
 			}
 		});
 		pack();
@@ -62,7 +67,7 @@ public class ThingMLApp extends JFrame {
 	public void setVisible(boolean visible) {
 		super.setVisible(visible);
 		if (visible) {
-			((ThingMLRootPane) getRootPane()).focusCurrentTextArea();
+			rootPane.focusCurrentTextArea();
 		}
 	}
 

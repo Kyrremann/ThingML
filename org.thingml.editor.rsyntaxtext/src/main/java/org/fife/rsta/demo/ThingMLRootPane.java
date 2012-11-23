@@ -116,6 +116,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	private String configFileName;
 	private String propertiesPath;
 	private List<String> filePaths;
+	private boolean safeToClose;
 
 	public ThingMLRootPane() {
 		this(null);
@@ -133,6 +134,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		atmf.putMapping("text/thingml",
 				"org.fife.ui.rsyntaxtextarea.modes.ThingMLTokenMaker");
 		TokenMakerFactory.setDefaultInstance(atmf);
+		setSafeToClose(true);
 		textAreas = new ArrayList<RSyntaxTextArea>();
 		properties = new ArrayList<Properties>();
 		filePaths = new ArrayList<String>();
@@ -141,7 +143,6 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		tabbedPane.addChangeListener(new ChangeListener() {
 
 			public void stateChanged(ChangeEvent event) {
-				// TODO: When changing tab, change all the current files :\
 				setFocusedTextArea(tabbedPane.getSelectedIndex());
 				loadProperties(tabbedPane.getSelectedIndex());
 				refreshSourceTree();
@@ -726,6 +727,10 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		focusCurrentTextArea();
 	}
 
+	public void setSafeToClose(boolean safe) {
+		this.safeToClose = safe;
+	}
+
 	public void addSaveStateToTitle(int index) {
 		String title = tabbedPane.getTitleAt(index);
 		if (!title.endsWith("*"))
@@ -769,6 +774,10 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		tabbedPane.removeTabAt(index);
 	}
 
+	public boolean isSafeToClose() {
+		return safeToClose;
+	}
+
 	private void loadProperties(int index) {
 		try {
 			Properties prop = this.properties.get(index);
@@ -786,6 +795,18 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	public void formatCurrentTextarea() {
 		RTextArea rTextArea = getCurrentTextArea();
 		rTextArea.setText(simpleFormatting(rTextArea.getText()));
+	}
+
+	public void saveTabs() {
+		for (int i = 0; i < getTabbedPane().getComponentCount(); i++) {
+			// System.out.println(i + ": " + getTabTitle(i));
+			if (getTabTitle(i).endsWith("*")) {
+				// System.out.println("Going to close tab " + i + " named " +
+				// getTabTitle(i));
+				setFocusedTextArea(i);
+				saveFile(i);
+			}
+		}
 	}
 
 	public String simpleFormatting(String input) {
@@ -849,21 +870,10 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		rSyntaxTextArea.setSyntaxEditingStyle(SYNTAX_STYLE_THINGML);
 		rSyntaxTextArea.setCaretPosition(0);
 		addFilePath(null);
-		System.out.println("Should be 0 -> " + getPropertiesSize());
 		putProperties(new Properties());
-		System.out.println("Should be 1 -> " + getPropertiesSize());
 		removeSaveStateFromTitle(getSelectedTabIndex());
 		if (treeSP != null)
 			refreshSourceTree();
-	}
-
-	public void saveTabs() {
-		for (int i = 0; i < getTabbedPane().getComponentCount(); i++) {
-			if (getTabTitle().endsWith("*")) {
-				setFocusedTextArea(i);
-				saveFile(i);
-			}
-		}
 	}
 
 	public void saveFile() {
@@ -872,7 +882,6 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 	public void saveFile(int index) {
 		final String path = getFilePath(index);
-		// TODO: Something is wrong here, both with title name and dialog name
 		if (path == null) {
 			new SaveAsAction(this, null).actionPerformed(null);
 			return;
@@ -885,6 +894,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 					BufferedWriter out = new BufferedWriter(fstream);
 					out.write(getCurrentTextArea().getText());
 					out.close();
+					// TODO: Need to be moved out of here
 					removeSaveStateFromTitle(getSelectedTabIndex());
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -898,14 +908,17 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 			public void run() {
 				try {
-					// TODO: addCurrentFilePath(tab, filePath);
-					int tab = tabbedPane.getSelectedIndex();
-					addTabTitle(tab, fileName);
-					setFilePath(tab, filePath);
 					FileWriter fstream = new FileWriter(filePath);
 					BufferedWriter out = new BufferedWriter(fstream);
 					out.write(getCurrentTextArea().getText());
 					out.close();
+					// TODO: addCurrentFilePath(tab, filePath);
+					// TODO: Need to move this out in case of closing tabs
+					// or count/remember the threads running
+					// as closing the application will kill the threads, I think.
+					int tab = tabbedPane.getSelectedIndex();
+					addTabTitle(tab, fileName);
+					setFilePath(tab, filePath);
 					removeSaveStateFromTitle(getSelectedTabIndex());
 				} catch (IOException e) {
 					e.printStackTrace();

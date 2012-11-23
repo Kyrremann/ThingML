@@ -216,6 +216,7 @@ interface Actions {
 		private ThingMLRootPane rootPane;
 
 		public SaveAction(ThingMLRootPane demo, ImageIcon icon) {
+			// TODO: Something is wrong here, both with title name and dialog name
 			super(null, icon);
 			this.rootPane = demo;
 			if (icon == null)
@@ -267,7 +268,8 @@ interface Actions {
 				} catch (Exception e) {// Catch exception if any
 					System.err.println("Error: " + e.getMessage());
 				}
-			}
+			} else if (rc == JFileChooser.CANCEL_OPTION)
+				rootPane.setSafeToClose(false);
 		}
 	}
 
@@ -438,10 +440,11 @@ interface Actions {
 		}
 
 		public void actionPerformed(ActionEvent arg0) {
-			// TODO: Need to check if tab is saved before closing it
 			if (rootPane.getTabbedPane().getComponentCount() > 1) {
-				JTabbedPane pane = rootPane.getTabbedPane();
-				int selected = pane.getSelectedIndex();
+				if (rootPane.getTabTitle().endsWith("*"))
+					rootPane.saveFile();
+				
+				int selected = rootPane.getSelectedTabIndex();
 				rootPane.removeTextArea(selected);
 				rootPane.removeProperties(selected);
 				rootPane.removeTabbedPane(selected);
