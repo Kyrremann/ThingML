@@ -21,9 +21,9 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
-import javax.swing.plaf.SliderUI;
 
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 
@@ -39,7 +39,6 @@ public class ThingMLApp extends JFrame {
 	private ThingMLRootPane rootPane;
 
 	public ThingMLApp() throws IOException {
-
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		setTitle("RSTA Language Support ThingML Demo Application");
 		setRootPane(new ThingMLRootPane());
@@ -47,14 +46,35 @@ public class ThingMLApp extends JFrame {
 		addWindowListener(new WindowAdapter() {
 
 			public void windowClosing(WindowEvent we) {
-				rootPane.setSafeToClose(true);
-				rootPane.saveTabs();
-				
-				if (rootPane.isSafeToClose())
-					dispose();
+				JFrame frame = (JFrame) we.getSource();
+				if (!rootPane.isTabsSaved()) {
+					int result = JOptionPane
+							.showConfirmDialog(
+									frame,
+									"Do you want to save before you exit the application?",
+									"Exit Application",
+									JOptionPane.YES_NO_CANCEL_OPTION);
+
+					if (result == JOptionPane.YES_OPTION) {
+						rootPane.saveTabs();
+						while (rootPane.isThereAliveThreads())
+							; // Not sure if this is a good while-loop...
+					} else if (result == JOptionPane.NO_OPTION)
+						frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				} else {
+					frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				}
 			}
 		});
 		pack();
+	}
+
+	public void pullThePlug() {
+		// dispose();
+		// if (rootPane.isSafeToClose()) {
+		WindowEvent wev = new WindowEvent(this, WindowEvent.WINDOW_CLOSING);
+		Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wev);
+		// }
 	}
 
 	/**

@@ -25,7 +25,7 @@ import java.util.Properties;
 import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
-import javax.swing.JTabbedPane;
+import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -35,7 +35,6 @@ import javax.swing.UIManager.LookAndFeelInfo;
 import org.fife.rsta.demo.AboutDialog;
 import org.fife.rsta.demo.ThingMLRootPane;
 import org.fife.rsta.demo.ExtensionFileFilter;
-import org.fife.rsta.thingml.ThingMLCellRenderer;
 
 /**
  * Container for all actions used by the demo.
@@ -108,7 +107,8 @@ interface Actions {
 
 		public void actionPerformed(ActionEvent e) {
 			if (chooser == null) {
-				chooser = new JFileChooser("./src/main/resources/samples/samples/BigRobot");
+				chooser = new JFileChooser(
+						"./src/main/resources/samples/samples/BigRobot");
 				chooser.setFileFilter(new ExtensionFileFilter(
 						"ThingML Source Files", "thingml"));
 			}
@@ -119,7 +119,7 @@ interface Actions {
 			}
 		}
 	}
-	
+
 	static class BrowseFileAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -128,7 +128,8 @@ interface Actions {
 		private ProjectDialog projectDialog;
 		private JTextField textField;
 
-		public BrowseFileAction(ProjectDialog projectDialog, JTextField textField) {
+		public BrowseFileAction(ProjectDialog projectDialog,
+				JTextField textField) {
 			super(null);
 			this.projectDialog = projectDialog;
 			this.textField = textField;
@@ -144,7 +145,8 @@ interface Actions {
 			int rc = chooser.showOpenDialog(projectDialog);
 			if (rc == JFileChooser.APPROVE_OPTION) {
 				try {
-					textField.setText(chooser.getSelectedFile().getCanonicalPath());
+					textField.setText(chooser.getSelectedFile()
+							.getCanonicalPath());
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -152,7 +154,7 @@ interface Actions {
 		}
 
 	}
-	
+
 	static class BrowseDirAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -173,11 +175,12 @@ interface Actions {
 				chooser = new JFileChooser();
 				chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			}
-			
+
 			int rc = chooser.showOpenDialog(projectDialog);
 			if (rc == JFileChooser.APPROVE_OPTION) {
 				try {
-					textField.setText(chooser.getSelectedFile().getCanonicalPath());
+					textField.setText(chooser.getSelectedFile()
+							.getCanonicalPath());
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -216,7 +219,6 @@ interface Actions {
 		private ThingMLRootPane rootPane;
 
 		public SaveAction(ThingMLRootPane demo, ImageIcon icon) {
-			// TODO: Something is wrong here, both with title name and dialog name
 			super(null, icon);
 			this.rootPane = demo;
 			if (icon == null)
@@ -257,12 +259,13 @@ interface Actions {
 			int rc = chooser.showSaveDialog(rootPane);
 			if (rc == JFileChooser.APPROVE_OPTION) {
 				try {
-					String name = chooser.getSelectedFile()
-							.getName();
-					if (!name.matches("\\..+"))					
-					rootPane.saveAsFile(chooser.getSelectedFile()
-							.getCanonicalPath() + ".thingml", name + ".thingml");
-					
+					String name = chooser.getSelectedFile().getName();
+					// if (!name.matches("\\..+"))
+					if (!name.endsWith(".thingml"))
+						rootPane.saveAsFile(chooser.getSelectedFile()
+								.getCanonicalPath() + ".thingml", name
+								+ ".thingml");
+
 					rootPane.saveAsFile(chooser.getSelectedFile()
 							.getCanonicalPath(), name);
 				} catch (Exception e) {// Catch exception if any
@@ -325,7 +328,7 @@ interface Actions {
 		}
 
 	}
-	
+
 	static class FormatAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
@@ -363,7 +366,6 @@ interface Actions {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			System.out.println("Should be one less then nex -> " + rootPane.getPropertiesSize());
 			if (title.equals("Blink")) {
 				rootPane.openFile(new File(
 						"src/main/resources/samples/samples/blink.thingml"));
@@ -385,8 +387,6 @@ interface Actions {
 						"src/main/resources/samples/samples/BigRobot/BigRobot.thingml"));
 				loadPropertiesAndSetfiles("src/main/resources/samples/samples/BigRobot/BigRobot.properties");
 			}
-
-			System.out.println("This is next -> " + rootPane.getPropertiesSize());
 		}
 
 		private void loadPropertiesAndSetfiles(String name) {
@@ -403,7 +403,7 @@ interface Actions {
 			}
 		}
 	}
-	
+
 	public class ProjectAction extends AbstractAction {
 
 		private static final long serialVersionUID = 6015770944269644342L;
@@ -425,8 +425,6 @@ interface Actions {
 
 	public class CloseTab extends AbstractAction {
 
-		// TODO: Check if tab is saved!
-
 		private static final long serialVersionUID = -7124045554769969122L;
 		ThingMLRootPane rootPane;
 
@@ -441,13 +439,30 @@ interface Actions {
 
 		public void actionPerformed(ActionEvent arg0) {
 			if (rootPane.getTabbedPane().getComponentCount() > 1) {
+				if (rootPane.getTabTitle().endsWith("*")) {
+					int result = JOptionPane.showConfirmDialog(rootPane,
+							"Do you want to save before you close this tab?",
+							"Close current tab",
+							JOptionPane.YES_NO_CANCEL_OPTION);
+
+					if (result == JOptionPane.YES_OPTION)
+						rootPane.saveFile();
+					else if (result == JOptionPane.CANCEL_OPTION)
+						return; // User don't want to close the tab
+				}
+				// TODO: When you save a tab, after another tab with the exact
+				// same name, it will override the old file :\
+				while (rootPane.isThereAliveThreads())
+					;
+
 				if (rootPane.getTabTitle().endsWith("*"))
-					rootPane.saveFile();
-				
+					return; // User pressed cancel somewhere :\
+
 				int selected = rootPane.getSelectedTabIndex();
 				rootPane.removeTextArea(selected);
 				rootPane.removeProperties(selected);
 				rootPane.removeTabbedPane(selected);
+
 			}
 		}
 	}

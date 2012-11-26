@@ -112,10 +112,11 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 	private List<RSyntaxTextArea> textAreas;
 	private List<Properties> properties;
+	private List<String> filePaths;
+	private List<Thread> threadList;
 	private String arduinoPath;
 	private String configFileName;
 	private String propertiesPath;
-	private List<String> filePaths;
 	private boolean safeToClose;
 
 	public ThingMLRootPane() {
@@ -123,9 +124,6 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	}
 
 	// TODO: Move all Actions to action file
-	// TODO: Make closing program more save, thinking about when you need to
-	// save and press X
-	// TODO: When saving, just one tab is checked, not all :\
 
 	public ThingMLRootPane(CompletionProvider provider) {
 
@@ -138,6 +136,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		textAreas = new ArrayList<RSyntaxTextArea>();
 		properties = new ArrayList<Properties>();
 		filePaths = new ArrayList<String>();
+		threadList = new ArrayList<Thread>();
 
 		tabbedPane = new JTabbedPane();
 		tabbedPane.addChangeListener(new ChangeListener() {
@@ -189,19 +188,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 		return rSyntaxTextArea;
 	}
-
-	public void addPane(RTextArea rTextArea) {
-		addPane("", rTextArea);
-	}
-
-	public void addPane(String title, RTextArea rTextArea) {
-		RTextScrollPane scrollPane = new RTextScrollPane(rTextArea, true);
-		scrollPane.setIconRowHeaderEnabled(true);
-		// scrollPane.getGutter().setBookmarkingEnabled(true);
-
-		tabbedPane.add(title, scrollPane);
-	}
-
+	
 	/**
 	 * Focuses the text area.
 	 */
@@ -606,15 +593,14 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 			int rc = chooser.showOpenDialog(this);
 			if (rc == JFileChooser.APPROVE_OPTION) {
 				try {
-					// TODO: Should be solved with a config file for each
-					// project
-					// or maybe even change the ThingML-language a bit guess I
-					// need
-					// to discuss this with Franck. Maybe it's master material?
-
 					setConfigFilePath(chooser.getSelectedFile()
 							.getCanonicalPath());
-					// TODO Handle it when user sets wrong config file
+					// TODO Check in advance if it's the correct config file, or
+					// let the user know that something went wrong when they are
+					// trying to compile, plus there is one config file for each
+					// compile. Maybe there is a pattern or a rule we can make
+					// that the config file should be in _* folder, and the
+					// config should have the same name?
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -642,16 +628,6 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		ThingmlResource resource = getThingmlResource();
 		ThingMLModel model = (ThingMLModel) resource.getContents().get(0);
 
-		// String arduinoDir = "/home/kyrremann/bin/arduino-0022";
-		// String libdir = arduinoDir + "/lib";
-
-		// TODO: Config file need to be set
-		// System.out.println("Open: " + configFileName);
-		// ((ThingMLParser)
-		// getCurrentTextArea().getParser(1)).setFilePath(configFileName);
-
-		// TODO: Maybe I can split this up, since I've already made a model of
-		// the code
 		CGenerator.compileAndRunArduino(model, getArduinoPath(),
 				getArduinoPath() + "/lib");
 	}
@@ -700,6 +676,10 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	public String getTabTitle(int index) {
 		return getTabbedPane().getTitleAt(index);
 	}
+	
+	public Thread getLastThread() {
+		return threadList.get(threadList.size() - 1);
+	}
 
 	public void setPropertiesPath(String propertiesPath) {
 		this.propertiesPath = propertiesPath;
@@ -729,6 +709,22 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 	public void setSafeToClose(boolean safe) {
 		this.safeToClose = safe;
+	}
+
+	public void addPane(RTextArea rTextArea) {
+		addPane("", rTextArea);
+	}
+
+	public void addPane(String title, RTextArea rTextArea) {
+		RTextScrollPane scrollPane = new RTextScrollPane(rTextArea, true);
+		scrollPane.setIconRowHeaderEnabled(true);
+		// scrollPane.getGutter().setBookmarkingEnabled(true);
+
+		tabbedPane.add(title, scrollPane);
+	}
+	
+	public boolean addThread(Thread thread) {
+		return threadList.add(thread);
 	}
 
 	public void addSaveStateToTitle(int index) {
@@ -773,9 +769,33 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	public void removeTabbedPane(int index) {
 		tabbedPane.removeTabAt(index);
 	}
+	
+	public Thread removeThread(int index) {
+		return threadList.remove(index);
+	}
 
 	public boolean isSafeToClose() {
 		return safeToClose;
+	}
+
+	public boolean isTabsSaved() {
+		for (int i = 0; i < getTabbedPane().getComponentCount(); i++) {
+			if (getTabTitle(i).endsWith("*")) {
+				setSafeToClose(false);
+				return false;
+			}
+		}
+
+		setSafeToClose(true);
+		return true;
+	}
+	
+	public boolean isThereAliveThreads() {
+		for (Thread thread : threadList)
+			if (thread.isAlive())
+				return true;
+		
+		return false;
 	}
 
 	private void loadProperties(int index) {
@@ -799,14 +819,12 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 	public void saveTabs() {
 		for (int i = 0; i < getTabbedPane().getComponentCount(); i++) {
-			// System.out.println(i + ": " + getTabTitle(i));
 			if (getTabTitle(i).endsWith("*")) {
-				// System.out.println("Going to close tab " + i + " named " +
-				// getTabTitle(i));
 				setFocusedTextArea(i);
 				saveFile(i);
 			}
 		}
+		setSafeToClose(true);
 	}
 
 	public String simpleFormatting(String input) {
@@ -823,11 +841,13 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 				if (!array[i].contains("\t"))
 					output += "\t";
 
-			// TODO: Stupid java and stupid end of line
-			if (array[i].contains("{") || array[i].matches("^.*do$"))// contains(" do"))
+			// Stupid java and stupid end of line
+			if (array[i].contains("{") || array[i].matches("^.*do$"))
 				indent++;
 
-			output += array[i] + "\n";
+			output += array[i];
+			if ((i + 1) < array.length)
+				output += "\n";
 		}
 
 		return output;
@@ -881,12 +901,14 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	}
 
 	public void saveFile(int index) {
+		for (String s : filePaths)
+			System.out.println(s);
 		final String path = getFilePath(index);
 		if (path == null) {
 			new SaveAsAction(this, null).actionPerformed(null);
 			return;
 		}
-		new Thread(new Runnable() {
+		addThread(new Thread(new Runnable() {
 
 			public void run() {
 				try {
@@ -894,17 +916,17 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 					BufferedWriter out = new BufferedWriter(fstream);
 					out.write(getCurrentTextArea().getText());
 					out.close();
-					// TODO: Need to be moved out of here
 					removeSaveStateFromTitle(getSelectedTabIndex());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
-		}).start();
+		}));
+		getLastThread().start();
 	}
 
 	public void saveAsFile(final String filePath, final String fileName) {
-		new Thread(new Runnable() {
+		addThread(new Thread(new Runnable() {
 
 			public void run() {
 				try {
@@ -913,9 +935,6 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 					out.write(getCurrentTextArea().getText());
 					out.close();
 					// TODO: addCurrentFilePath(tab, filePath);
-					// TODO: Need to move this out in case of closing tabs
-					// or count/remember the threads running
-					// as closing the application will kill the threads, I think.
 					int tab = tabbedPane.getSelectedIndex();
 					addTabTitle(tab, fileName);
 					setFilePath(tab, filePath);
@@ -924,6 +943,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 					e.printStackTrace();
 				}
 			}
-		}).start();
+		}));
+		getLastThread().start();
 	}
 }
