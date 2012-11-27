@@ -56,9 +56,11 @@ public class ThingMLApp extends JFrame {
 									JOptionPane.YES_NO_CANCEL_OPTION);
 
 					if (result == JOptionPane.YES_OPTION) {
+
 						rootPane.saveTabs();
 						while (rootPane.isThereAliveThreads())
 							; // Not sure if this is a good while-loop...
+						frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 					} else if (result == JOptionPane.NO_OPTION)
 						frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				} else {
@@ -70,11 +72,8 @@ public class ThingMLApp extends JFrame {
 	}
 
 	public void pullThePlug() {
-		// dispose();
-		// if (rootPane.isSafeToClose()) {
 		WindowEvent wev = new WindowEvent(this, WindowEvent.WINDOW_CLOSING);
 		Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wev);
-		// }
 	}
 
 	/**

@@ -124,6 +124,8 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	}
 
 	// TODO: Move all Actions to action file
+	// TODO: You can override files without question :\
+	// TODO: What to do when your're opening the same file in multiple tabs?
 
 	public ThingMLRootPane(CompletionProvider provider) {
 
@@ -405,7 +407,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 		menu.addSeparator();
 
-		menu.add(new JMenuItem(new ExitAction()));
+		menu.add(new JMenuItem(new ExitAction(this)));
 		mb.add(menu);
 
 		menu = new JMenu("Edit");
@@ -691,7 +693,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 	public void setFilePath(int index, String path) {
 		((ThingMLParser) getCurrentTextArea().getParser(1)).setFilePath(path);
-		filePaths.add(index, path);
+		filePaths.set(index, path);
 	}
 
 	public void setArduinoPath(String arudino) {

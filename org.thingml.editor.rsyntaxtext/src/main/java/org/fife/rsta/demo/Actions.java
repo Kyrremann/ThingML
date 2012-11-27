@@ -15,8 +15,12 @@
  */
 package org.fife.rsta.demo;
 
+import java.awt.Frame;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -72,14 +76,18 @@ interface Actions {
 	static class ExitAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
+		
+		private ThingMLRootPane rootPane;
 
-		public ExitAction() {
+		public ExitAction(ThingMLRootPane rootPane) {
+			this.rootPane = rootPane;
 			putValue(NAME, "Exit");
 			putValue(MNEMONIC_KEY, new Integer('x'));
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			System.exit(0);
+			WindowEvent wev = new WindowEvent((Window) rootPane.getParent(), WindowEvent.WINDOW_CLOSING);
+			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wev);
 		}
 
 	}
