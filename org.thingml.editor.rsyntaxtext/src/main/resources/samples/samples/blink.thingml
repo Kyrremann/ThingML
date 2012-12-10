@@ -10,7 +10,7 @@ thing Blink includes LedMsgs, TimerMsgs
 
     statechart BlinkImpl init Blinking 
     {    
-        state Blinking 
+        state Blinking
         {    
             on entry HW!timer_start (1000)
             

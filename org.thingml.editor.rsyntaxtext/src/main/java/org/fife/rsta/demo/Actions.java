@@ -460,8 +460,8 @@ interface Actions {
 				}
 				// TODO: When you save a tab, after another tab with the exact
 				// same name, it will override the old file :\
-				while (rootPane.isThereAliveThreads())
-					;
+				// while (rootPane.isThereAliveThreads())
+				// ;
 
 				if (rootPane.getTabTitle().endsWith("*"))
 					return; // User pressed cancel somewhere :\

@@ -94,6 +94,8 @@ import org.sintef.thingml.ThingMLModel;
 import org.sintef.thingml.ThingmlPackage;
 import org.sintef.thingml.resource.thingml.mopp.ThingmlResource;
 import org.sintef.thingml.resource.thingml.mopp.ThingmlResourceFactory;
+import org.sintef.thingml.resource.thingml.ui.ThingmlCodeCompletionHelper;
+import org.sintef.thingml.resource.thingml.ui.ThingmlCompletionProposal;
 import org.thingml.cgenerator.CGenerator;
 
 public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
@@ -190,7 +192,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 		return rSyntaxTextArea;
 	}
-	
+
 	/**
 	 * Focuses the text area.
 	 */
@@ -286,6 +288,11 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		provider.setStringCompletionProvider(stringCP);
 		provider.setCommentCompletionProvider(commentCP);
 
+		// TODO: This may work. Next is to try to add completion on the fly!
+		DefaultCompletionProvider dcp = (DefaultCompletionProvider) provider
+				.getDefaultCompletionProvider();
+		dcp.addCompletion(new BasicCompletion(dcp, "Test"));
+
 		return provider;
 
 	}
@@ -321,8 +328,8 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 					saveCount = 0;
 				} else
 					saveCount++;
-
-				addSaveStateToTitle(getSelectedTabIndex());
+				if (!isTabSaved())
+					addSaveStateToTitle(getSelectedTabIndex());
 			}
 		});
 		textArea.setCaretPosition(0);
@@ -627,11 +634,44 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	}
 
 	public void compileAndRunArduino() {
+		saveFile();
+		// TODO: Save when compiling, and report when there are errors and ask
+		// if the want to compile or fix errors
+		// I also need to check for missing config
 		ThingmlResource resource = getThingmlResource();
 		ThingMLModel model = (ThingMLModel) resource.getContents().get(0);
 
-		CGenerator.compileAndRunArduino(model, getArduinoPath(),
-				getArduinoPath() + "/lib");
+		// ThingmlReferenceResolverSwitch switch1 = new
+		// ThingmlReferenceResolverSwitch();
+		// switch1.resolveFuzzy("S", container, null, position, result)
+		// System.out.println(model.eClass().getEPackage().getEFactoryInstance().createFromString(null,
+		// "TEST"));
+		// System.out.println(((org.sintef.thingml.Region)
+		// model.eClass().getEPackage().getEFactoryInstance().create(model.eClass())));
+		//
+		// IThingmlReferenceResolveResult<State> result = new
+		// ThingmlReferenceResolveResult<State>(true);
+		// RegionInitialReferenceResolver resolver = new
+		// RegionInitialReferenceResolver();
+		// resolver.resolve("B", (org.sintef.thingml.Region) model.eContainer(),
+		// null, 0, true, result);
+		// System.out.printf("Error: %s\nMsg: %s\nQuick: %s\n",
+		// result.getErrorMessage(), result.getMappings(),
+		// result.getQuickFixes());
+		ThingmlCodeCompletionHelper helper = new ThingmlCodeCompletionHelper();
+		ThingmlCompletionProposal[] proposal = helper
+				.computeCompletionProposals(resource, getCurrentTextArea()
+						.getText(), 207);
+		System.out.println("Length: " + proposal.length);
+		for (ThingmlCompletionProposal p : proposal)
+			System.out.printf("Mem: %s\nIns: %s\nPre: %s\nStr: %s\nCon: %s\n",
+					p, p.getInsertString(), p.getPrefix(),
+					p.getStructuralFeature(), p.getContainer());
+		// TODO: This is in fact working, getInsertString is the correct "word",
+		// just need to "do this" when the user press ctrl+space
+
+		// CGenerator.compileAndRunArduino(model, getArduinoPath(),
+		// getArduinoPath() + "/lib");
 	}
 
 	public void uninstallSourceTree() {
@@ -678,7 +718,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	public String getTabTitle(int index) {
 		return getTabbedPane().getTitleAt(index);
 	}
-	
+
 	public Thread getLastThread() {
 		return threadList.get(threadList.size() - 1);
 	}
@@ -724,7 +764,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 		tabbedPane.add(title, scrollPane);
 	}
-	
+
 	public boolean addThread(Thread thread) {
 		return threadList.add(thread);
 	}
@@ -771,13 +811,17 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	public void removeTabbedPane(int index) {
 		tabbedPane.removeTabAt(index);
 	}
-	
+
 	public Thread removeThread(int index) {
 		return threadList.remove(index);
 	}
 
 	public boolean isSafeToClose() {
 		return safeToClose;
+	}
+
+	public boolean isTabSaved() {
+		return getTabTitle().endsWith("*");
 	}
 
 	public boolean isTabsSaved() {
@@ -791,12 +835,12 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		setSafeToClose(true);
 		return true;
 	}
-	
+
 	public boolean isThereAliveThreads() {
 		for (Thread thread : threadList)
 			if (thread.isAlive())
 				return true;
-		
+
 		return false;
 	}
 
@@ -903,8 +947,6 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	}
 
 	public void saveFile(int index) {
-		for (String s : filePaths)
-			System.out.println(s);
 		final String path = getFilePath(index);
 		if (path == null) {
 			new SaveAsAction(this, null).actionPerformed(null);
@@ -925,6 +967,11 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 			}
 		}));
 		getLastThread().start();
+		try {
+			getLastThread().join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void saveAsFile(final String filePath, final String fileName) {
@@ -947,5 +994,10 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 			}
 		}));
 		getLastThread().start();
+		try {
+			getLastThread().join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 }

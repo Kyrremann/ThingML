@@ -74,6 +74,7 @@ public class ThingMLParser extends AbstractParser {
 	private ThingmlResource resource;
 	private ThingMLTree tree;
 	private String currentFilePath;
+	private int errorCount;
 
 	ThingMLParser(ThingMLLanguageSupport thingMLLanguageSupport) {
 		this.currentFilePath = "http://www.ThingML.org/";
@@ -153,6 +154,7 @@ public class ThingMLParser extends AbstractParser {
 
 			// Register errors
 			int offset;
+			setErrorCount(resource.getErrors().size());
 			for (Diagnostic diagnostic : resource.getErrors()) {
 				offset = getIndex(document, diagnostic.getLine(),
 						diagnostic.getColumn());
@@ -202,12 +204,12 @@ public class ThingMLParser extends AbstractParser {
 	public int getLength(String message) {
 		// TODO: Not a proper way to find the length
 		// return message.split("\"")[1].split(" ")[0].length();
-		System.out.printf("Message: %s\n", message);
+		// System.out.printf("Message: %s\n", message);
 		for (String s : message.split(" "))
 			System.out.print(s + ", ");
 
 		String[] array = message.split(" ");
-		return array[array.length - 1].length();
+		return array[array.length - 1].trim().length();
 		// return message.length();
 	}
 
@@ -217,5 +219,13 @@ public class ThingMLParser extends AbstractParser {
 
 	public String getCurrentFilePath() {
 		return currentFilePath;
+	}
+	
+	public void setErrorCount(int count) {
+		this.errorCount = count;
+	}
+	
+	public int getErrorCount() {
+		return errorCount;
 	}
 }

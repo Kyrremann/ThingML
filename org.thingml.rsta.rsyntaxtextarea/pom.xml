@@ -2,8 +2,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.thingml</groupId>
-  <artifactId>org.thingml.editor.rsyntaxtext</artifactId>
-  <name>ThingML :: Editor :: RSyntaxText</name>
+  <artifactId>org.thingml.rsta.rsyntaxtextarea</artifactId>
+  <name>ThingML :: RSTA :: RSyntaxTextArea</name>
   <packaging>jar</packaging>
 
   <parent>
@@ -15,15 +15,10 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.thingml</groupId>
-      <artifactId>org.thingml.rsta.rsyntaxtextarea</artifactId>
-      <version>1.1</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.thingml</groupId>
-      <artifactId>org.thingml.rsta.ac</artifactId>
-      <version>1.1</version>
+      <groupId>org.thingml.rsta</groupId>
+      <artifactId>org.thingml.rsta.languagesupport</artifactId>
+      <relativePath>org.thingml.rsta.languagesupport/trunk</relativePath>
+      <version>1.1.1.1</version>
     </dependency>
 
     <dependency>
@@ -31,7 +26,6 @@
       <artifactId>org.kevoree.extra.jsyntaxpane</artifactId>
       <version>0.9.6-SNAPSHOT</version>
     </dependency>
-
     <dependency>
       <groupId>org.scala-lang</groupId>
       <artifactId>scala-library</artifactId>

@@ -1,0 +1,15 @@
+import "../hardware/bricks/led.thingml"
+
+thing Wondring includes LedMsgs {
+
+required port someName {
+receives led_toggle
+sends led_toggle 
+}
+
+statechart WonderingImpl init Think {
+
+state Think {
+}
+}
+}

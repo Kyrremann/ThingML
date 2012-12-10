@@ -14,9 +14,7 @@ thing Blink includes LedMsgs, TimerMsgs
         {    
             on entry HW!timer_start (1000)
             
-            transition -> Blinking 
-            event HW?timer_timeout 
-            action HW!led_toggle () 
+            transition -> Blinking
         }
     }
 }

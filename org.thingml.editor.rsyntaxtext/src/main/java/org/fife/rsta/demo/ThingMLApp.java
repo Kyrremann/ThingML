@@ -58,8 +58,8 @@ public class ThingMLApp extends JFrame {
 					if (result == JOptionPane.YES_OPTION) {
 
 						rootPane.saveTabs();
-						while (rootPane.isThereAliveThreads())
-							; // Not sure if this is a good while-loop...
+						//while (rootPane.isThereAliveThreads())
+							// ; // Not sure if this is a good while-loop...
 						frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 					} else if (result == JOptionPane.NO_OPTION)
 						frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
