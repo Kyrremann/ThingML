@@ -17,7 +17,10 @@ package org.fife.rsta.demo;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Event;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -50,6 +53,7 @@ import javax.swing.JSplitPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JToolBar;
 import javax.swing.JTree;
+import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.ToolTipManager;
@@ -99,7 +103,7 @@ import org.sintef.thingml.resource.thingml.ui.ThingmlCompletionProposal;
 import org.thingml.cgenerator.CGenerator;
 
 public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
-		SyntaxConstants, Actions {
+		SyntaxConstants, Actions, KeyListener {
 
 	private static final long serialVersionUID = -1417936399179936282L;
 	private JScrollPane treeSP;
@@ -189,6 +193,8 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		autoCodeCompletion.setShowDescWindow(true);
 		autoCodeCompletion.setParameterAssistanceEnabled(true);
 		autoCodeCompletion.install(rSyntaxTextArea);
+
+		rSyntaxTextArea.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, Event.CTRL_MASK), new ContentAssistAction(this, autoCodeCompletion));
 
 		return rSyntaxTextArea;
 	}
@@ -288,11 +294,6 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		provider.setStringCompletionProvider(stringCP);
 		provider.setCommentCompletionProvider(commentCP);
 
-		// TODO: This may work. Next is to try to add completion on the fly!
-		DefaultCompletionProvider dcp = (DefaultCompletionProvider) provider
-				.getDefaultCompletionProvider();
-		dcp.addCompletion(new BasicCompletion(dcp, "Test"));
-
 		return provider;
 
 	}
@@ -332,6 +333,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 					addSaveStateToTitle(getSelectedTabIndex());
 			}
 		});
+
 		textArea.setCaretPosition(0);
 		textArea.addHyperlinkListener(this);
 		textArea.requestFocusInWindow();
@@ -641,37 +643,8 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		ThingmlResource resource = getThingmlResource();
 		ThingMLModel model = (ThingMLModel) resource.getContents().get(0);
 
-		// ThingmlReferenceResolverSwitch switch1 = new
-		// ThingmlReferenceResolverSwitch();
-		// switch1.resolveFuzzy("S", container, null, position, result)
-		// System.out.println(model.eClass().getEPackage().getEFactoryInstance().createFromString(null,
-		// "TEST"));
-		// System.out.println(((org.sintef.thingml.Region)
-		// model.eClass().getEPackage().getEFactoryInstance().create(model.eClass())));
-		//
-		// IThingmlReferenceResolveResult<State> result = new
-		// ThingmlReferenceResolveResult<State>(true);
-		// RegionInitialReferenceResolver resolver = new
-		// RegionInitialReferenceResolver();
-		// resolver.resolve("B", (org.sintef.thingml.Region) model.eContainer(),
-		// null, 0, true, result);
-		// System.out.printf("Error: %s\nMsg: %s\nQuick: %s\n",
-		// result.getErrorMessage(), result.getMappings(),
-		// result.getQuickFixes());
-		ThingmlCodeCompletionHelper helper = new ThingmlCodeCompletionHelper();
-		ThingmlCompletionProposal[] proposal = helper
-				.computeCompletionProposals(resource, getCurrentTextArea()
-						.getText(), 207);
-		System.out.println("Length: " + proposal.length);
-		for (ThingmlCompletionProposal p : proposal)
-			System.out.printf("Mem: %s\nIns: %s\nPre: %s\nStr: %s\nCon: %s\n",
-					p, p.getInsertString(), p.getPrefix(),
-					p.getStructuralFeature(), p.getContainer());
-		// TODO: This is in fact working, getInsertString is the correct "word",
-		// just need to "do this" when the user press ctrl+space
-
-		// CGenerator.compileAndRunArduino(model, getArduinoPath(),
-		// getArduinoPath() + "/lib");
+		CGenerator.compileAndRunArduino(model, getArduinoPath(),
+		getArduinoPath() + "/lib");
 	}
 
 	public void uninstallSourceTree() {
@@ -721,6 +694,10 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 	public Thread getLastThread() {
 		return threadList.get(threadList.size() - 1);
+	}
+	
+	public int getCaretPosition() {
+		return getCurrentTextArea().getCaretPosition();
 	}
 
 	public void setPropertiesPath(String propertiesPath) {
@@ -999,5 +976,20 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public void keyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void keyTyped(KeyEvent e) {
+		// TODO Auto-generated method stub
+
 	}
 }

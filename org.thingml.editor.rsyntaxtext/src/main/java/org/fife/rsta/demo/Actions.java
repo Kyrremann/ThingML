@@ -24,9 +24,13 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 import javax.swing.AbstractAction;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -35,10 +39,20 @@ import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
+import javax.swing.text.JTextComponent;
 
 import org.fife.rsta.demo.AboutDialog;
 import org.fife.rsta.demo.ThingMLRootPane;
 import org.fife.rsta.demo.ExtensionFileFilter;
+import org.fife.ui.autocomplete.AutoCompletion;
+import org.fife.ui.autocomplete.BasicCompletion;
+import org.fife.ui.autocomplete.Completion;
+import org.fife.ui.autocomplete.CompletionProvider;
+import org.fife.ui.autocomplete.DefaultCompletionProvider;
+import org.fife.ui.autocomplete.LanguageAwareCompletionProvider;
+import org.sintef.thingml.resource.thingml.ui.ThingmlCodeCompletionHelper;
+import org.sintef.thingml.resource.thingml.ui.ThingmlCompletionProposal;
+import org.sintef.thingml.resource.thingml.ui.ThingmlProposalPostProcessor;
 
 /**
  * Container for all actions used by the demo.
@@ -76,7 +90,7 @@ interface Actions {
 	static class ExitAction extends AbstractAction {
 
 		private static final long serialVersionUID = 1L;
-		
+
 		private ThingMLRootPane rootPane;
 
 		public ExitAction(ThingMLRootPane rootPane) {
@@ -86,7 +100,8 @@ interface Actions {
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			WindowEvent wev = new WindowEvent((Window) rootPane.getParent(), WindowEvent.WINDOW_CLOSING);
+			WindowEvent wev = new WindowEvent((Window) rootPane.getParent(),
+					WindowEvent.WINDOW_CLOSING);
 			Toolkit.getDefaultToolkit().getSystemEventQueue().postEvent(wev);
 		}
 
@@ -473,5 +488,52 @@ interface Actions {
 
 			}
 		}
+	}
+
+	static class ContentAssistAction extends AbstractAction {
+
+		private static final long serialVersionUID = 1L;
+
+		private AutoCompletion autoCompletion;
+		private ThingMLRootPane rootPane;
+
+		public ContentAssistAction(ThingMLRootPane rootPane,
+				AutoCompletion autoCompletion) {
+			this.autoCompletion = autoCompletion;
+			this.rootPane = rootPane;
+		}
+
+		public void actionPerformed(ActionEvent e) {
+			LanguageAwareCompletionProvider provider = (LanguageAwareCompletionProvider) autoCompletion
+					.getCompletionProvider();
+			DefaultCompletionProvider dcp = (DefaultCompletionProvider) provider
+					.getDefaultCompletionProvider();
+
+			ThingmlCodeCompletionHelper helper = new ThingmlCodeCompletionHelper();
+			ThingmlCompletionProposal[] proposals = helper
+					.computeCompletionProposals(rootPane.getThingmlResource(),
+							rootPane.getCurrentTextArea().getText(),
+							rootPane.getCaretPosition());
+			ThingmlProposalPostProcessor postProcessor = new ThingmlProposalPostProcessor();
+			List<ThingmlCompletionProposal> postProposals = postProcessor
+					.process(Arrays.asList(proposals));
+			if (postProposals == null)
+				postProposals = java.util.Collections.emptyList();
+
+			List<ThingmlCompletionProposal> finalProposals = new ArrayList<ThingmlCompletionProposal>();
+			for (ThingmlCompletionProposal proposal : postProposals) {
+				if (proposal.getMatchesPrefix())
+					finalProposals.add(proposal);
+			}
+
+			dcp.clear();
+			for (ThingmlCompletionProposal proposal : finalProposals) {
+				dcp.addCompletion(new BasicCompletion(dcp, proposal
+						.getInsertString()));
+			}
+
+			autoCompletion.doCompletion();
+		}
+
 	}
 }
