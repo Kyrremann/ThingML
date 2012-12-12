@@ -388,7 +388,7 @@ interface Actions {
 			this.title = title;
 		}
 
-		public void actionPerformed(ActionEvent e) {
+		public void actionPerformed(ActionEvent e) {			
 			if (title.equals("Blink")) {
 				rootPane.openFile(new File(
 						"src/main/resources/samples/samples/blink.thingml"));

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry kind="src" path="src/main/resources"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/J2SE-1.5"/>
 	<classpathentry kind="lib" path="/home/kyrremann/workspace/RSyntaxTextarea/RSyntaxTextArea/trunk/dist/rsyntaxtextarea.jar" sourcepath="/home/kyrremann/workspace/ThingML-Editor/RSyntaxTextArea"/>
 	<classpathentry kind="lib" path="/home/kyrremann/workspace/RSyntaxTextarea/ThingMLDemo/lib/java-cup-11a.jar"/>
@@ -23,6 +24,8 @@
 	<classpathentry kind="lib" path="/home/kyrremann/.m2/repository/org/thingml/org.thingml.utils/0.6.0-SNAPSHOT/org.thingml.utils-0.6.0-20120904.152048-148.jar"/>
 	<classpathentry kind="lib" path="/home/kyrremann/.m2/repository/org/emftext/org.emftext.commons.antlr/3.3.0/org.emftext.commons.antlr-3.3.0.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/org.sintef.thingml.resource.thingml.ui"/>
+	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_COMPILER_CONTAINER"/>
+	<classpathentry kind="con" path="org.scala-ide.sdt.launching.SCALA_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 	<referencedentry kind="lib" path="/home/kyrremann/workspace/RSyntaxTextarea/RSTALanguageSupport/dist/autocomplete.jar" sourcepath="/home/kyrremann/workspace/RSyntaxTextarea/AutoComplete/src"/>
 </classpath>
