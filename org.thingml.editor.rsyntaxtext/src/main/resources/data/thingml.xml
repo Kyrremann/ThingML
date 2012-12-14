@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    Copyright (C) 2011 SINTEF <franck.fleurey@sintef.no>
+
+    Licensed under the GNU LESSER GENERAL PUBLIC LICENSE, Version 3, 29 June 2007;
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+    	http://www.gnu.org/licenses/lgpl-3.0.txt
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<!DOCTYPE api SYSTEM "CompletionXml.dtd">
+<api language="THINGML" >
+  <keywords>
+    <keyword name="StateMachine" definedIn="ThingML v1.0" type="StateMachine">
+      <desc>The state machine cover the whole program and is in the real ThingML called StateChart.</desc>
+    </keyword>
+    <keyword name="State" type="State">
+      <desc>States are a subsections inside a StateMachine which are used to communicate and execute commands.</desc>
+    </keyword>
+    <keyword name="init" type="State">
+        <desc>Init is used to choose which state is the start state.</desc>
+    </keyword>
+    <keyword name="final" type="State">
+        <desc>Final is the opposite of the init-state and let you choose which state(s) can be the finalizing state.</desc>
+    </keyword>
+    <keyword name="->" type="Transition">
+        <desc>Each state uses a transition to communicate and transfer data between them. Each transition are weighted.</desc>
+    </keyword>
+  </keywords>
+</api>
