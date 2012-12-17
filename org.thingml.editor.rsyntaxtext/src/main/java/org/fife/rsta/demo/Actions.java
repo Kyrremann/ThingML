@@ -50,6 +50,7 @@ import org.fife.ui.autocomplete.Completion;
 import org.fife.ui.autocomplete.CompletionProvider;
 import org.fife.ui.autocomplete.DefaultCompletionProvider;
 import org.fife.ui.autocomplete.LanguageAwareCompletionProvider;
+import org.sintef.thingml.resource.thingml.mopp.ThingmlResource;
 import org.sintef.thingml.resource.thingml.ui.ThingmlCodeCompletionHelper;
 import org.sintef.thingml.resource.thingml.ui.ThingmlCompletionProposal;
 import org.sintef.thingml.resource.thingml.ui.ThingmlProposalPostProcessor;
@@ -504,6 +505,13 @@ interface Actions {
 		}
 
 		public void actionPerformed(ActionEvent e) {
+			ThingmlResource resource = rootPane.getThingmlResource();
+			if (resource == null) {// No resources available
+				rootPane.setStatusLineMessage("Save file to get better content assist");
+				autoCompletion.doCompletion();
+				return;
+			}
+			
 			LanguageAwareCompletionProvider provider = (LanguageAwareCompletionProvider) autoCompletion
 					.getCompletionProvider();
 			DefaultCompletionProvider dcp = (DefaultCompletionProvider) provider
@@ -511,7 +519,7 @@ interface Actions {
 
 			ThingmlCodeCompletionHelper helper = new ThingmlCodeCompletionHelper();
 			ThingmlCompletionProposal[] proposals = helper
-					.computeCompletionProposals(rootPane.getThingmlResource(),
+					.computeCompletionProposals(resource,
 							rootPane.getCurrentTextArea().getText(),
 							rootPane.getCaretPosition());
 			ThingmlProposalPostProcessor postProcessor = new ThingmlProposalPostProcessor();
@@ -534,6 +542,6 @@ interface Actions {
 
 			autoCompletion.doCompletion();
 		}
-
 	}
+	
 }

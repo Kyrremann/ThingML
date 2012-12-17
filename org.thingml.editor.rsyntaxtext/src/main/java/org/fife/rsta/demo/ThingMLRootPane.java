@@ -39,6 +39,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -103,7 +104,7 @@ import org.sintef.thingml.resource.thingml.ui.ThingmlCompletionProposal;
 import org.thingml.cgenerator.CGenerator;
 
 public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
-		SyntaxConstants, Actions, KeyListener {
+		SyntaxConstants, Actions {
 
 	private static final long serialVersionUID = -1417936399179936282L;
 	private JScrollPane treeSP;
@@ -123,6 +124,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	private String arduinoPath;
 	private String configFileName;
 	private String propertiesPath;
+	private String statusLineMessage;
 	private boolean safeToClose;
 
 	public ThingMLRootPane() {
@@ -145,6 +147,7 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		properties = new ArrayList<Properties>();
 		filePaths = new ArrayList<String>();
 		threadList = new ArrayList<Thread>();
+		setStatusLineMessage("");
 
 		tabbedPane = new JTabbedPane();
 		tabbedPane.addChangeListener(new ChangeListener() {
@@ -179,6 +182,42 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		refreshSourceTree();
 	}
 
+	/**
+	 * Focuses the text area.
+	 */
+	public void focusCurrentTextArea() {
+		getCurrentTextArea().requestFocusInWindow();
+	}
+
+	private void refreshSourceTree() {
+		refreshSourceTree(getCurrentTextArea());
+	}
+
+	/**
+	 * Displays a tree view of the current source code, if available for the
+	 * current programming language.
+	 */
+	private void refreshSourceTree(RSyntaxTextArea textArea) {
+
+		if (tree != null) {
+			tree.uninstall();
+			treeSP.remove(tree);
+		}
+
+		String language = textArea.getSyntaxEditingStyle();
+		if (SyntaxConstants.SYNTAX_STYLE_THINGML.equals(language)) {
+			tree = new ThingMLOutlineTree();
+		} else {
+			tree = null;
+		}
+
+		if (tree != null) {
+			tree.listenTo(textArea);
+			treeSP.setViewportView(tree);
+			treeSP.revalidate();
+		}
+	}
+
 	private RSyntaxTextArea createAndAddTextArea(String title,
 			CompletionProvider provider) {
 		RSyntaxTextArea rSyntaxTextArea = createTextArea();
@@ -194,24 +233,11 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		autoCodeCompletion.setParameterAssistanceEnabled(true);
 		autoCodeCompletion.install(rSyntaxTextArea);
 
-		rSyntaxTextArea.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, Event.CTRL_MASK), new ContentAssistAction(this, autoCodeCompletion));
+		rSyntaxTextArea.getInputMap().put(
+				KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, Event.CTRL_MASK),
+				new ContentAssistAction(this, autoCodeCompletion));
 
 		return rSyntaxTextArea;
-	}
-
-	/**
-	 * Focuses the text area.
-	 */
-	public void focusCurrentTextArea() {
-		getCurrentTextArea().requestFocusInWindow();
-	}
-
-	public void setCurrentTextArea(RSyntaxTextArea rSyntaxTextArea) {
-		// currentTextArea = null;// rSyntaxTextArea;
-	}
-
-	public RSyntaxTextArea getCurrentTextArea() {
-		return textAreas.get(getSelectedTabIndex());
 	}
 
 	/**
@@ -298,85 +324,6 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 	}
 
-	/**
-	 * Creates the text area for this application.
-	 * 
-	 * @return The text area.
-	 */
-	private RSyntaxTextArea createTextArea() {
-		RSyntaxTextArea textArea = new RSyntaxTextArea(30, 100);
-		LanguageSupportFactory.get().register(textArea);
-		textArea.addCaretListener(new CaretListener() {
-
-			public void caretUpdate(CaretEvent event) {
-				setStatusline(0, event.getDot());
-			}
-		});
-
-		textArea.getDocument().addDocumentListener(new DocumentListener() {
-
-			public void removeUpdate(DocumentEvent e) {
-			}
-
-			public void insertUpdate(DocumentEvent e) {
-			}
-
-			int saveCount = 0;
-
-			public void changedUpdate(DocumentEvent e) {
-				if (saveCount == 30) {
-					saveFile();
-					saveCount = 0;
-				} else
-					saveCount++;
-				if (!isTabSaved())
-					addSaveStateToTitle(getSelectedTabIndex());
-			}
-		});
-
-		textArea.setCaretPosition(0);
-		textArea.addHyperlinkListener(this);
-		textArea.requestFocusInWindow();
-		textArea.setMarkOccurrences(true);
-		textArea.setCodeFoldingEnabled(true);
-		ToolTipManager.sharedInstance().registerComponent(textArea);
-		return textArea;
-	}
-
-	private void refreshSourceTree() {
-		refreshSourceTree(getCurrentTextArea());
-	}
-
-	/**
-	 * Displays a tree view of the current source code, if available for the
-	 * current programming language.
-	 */
-	private void refreshSourceTree(RSyntaxTextArea textArea) {
-
-		if (tree != null) {
-			tree.uninstall();
-			treeSP.remove(tree);
-		}
-
-		String language = textArea.getSyntaxEditingStyle();
-		if (SyntaxConstants.SYNTAX_STYLE_THINGML.equals(language)) {
-			tree = new ThingMLOutlineTree();
-		} else {
-			tree = null;
-		}
-
-		if (tree != null) {
-			tree.listenTo(textArea);
-			treeSP.setViewportView(tree);
-			treeSP.revalidate();
-		}
-	}
-
-	private void setStatusline(int line, int offset) {
-		if (cursorLabel != null)
-			cursorLabel.setText("Char: " + offset);
-	}
-
 	private JPanel createStatusPanel() {
 		JPanel statusPanel = new JPanel();
 		statusPanel.setBorder(new BevelBorder(BevelBorder.LOWERED));
@@ -454,12 +401,6 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 	}
 
-	private void addItem(Action a, ButtonGroup bg, JMenu menu) {
-		JRadioButtonMenuItem item = new JRadioButtonMenuItem(a);
-		bg.add(item);
-		menu.add(item);
-	}
-
 	private JToolBar createToolBar() {
 		JToolBar toolbar = new JToolBar("Toolbar", JToolBar.HORIZONTAL);
 
@@ -518,6 +459,60 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	}
 
 	/**
+	 * Creates the text area for this application.
+	 * 
+	 * @return The text area.
+	 */
+	private RSyntaxTextArea createTextArea() {
+		RSyntaxTextArea textArea = new RSyntaxTextArea(30, 100);
+		LanguageSupportFactory.get().register(textArea);
+		textArea.addCaretListener(new CaretListener() {
+
+			public void caretUpdate(CaretEvent event) {
+				setStatusline(0, event.getDot());
+			}
+		});
+
+		textArea.getDocument().addDocumentListener(new DocumentListener() {
+
+			public void removeUpdate(DocumentEvent e) {
+			}
+
+			public void insertUpdate(DocumentEvent e) {
+			}
+
+			int saveCount = 0;
+
+			public void changedUpdate(DocumentEvent e) {
+				if (getTabTitle().equals("Untitle")
+						|| getTabTitle().equals("Untitle*")) {
+					// TODO: User has probably just started a file, no need to
+					// save, so just
+					// return a null. Should be switched out with a temporarily
+					// save file.
+					setStatusLineMessage("Save file to enable auto-save.");
+					return;
+				} else if (saveCount == 30) {
+					saveFile();
+					saveCount = 0;
+				} else
+					saveCount++;
+				if (!isTabSaved())
+					addSaveStateToTitle(getSelectedTabIndex());
+			}
+
+		});
+
+		textArea.setCaretPosition(0);
+		textArea.addHyperlinkListener(this);
+		textArea.requestFocusInWindow();
+		textArea.setMarkOccurrences(true);
+		textArea.setCodeFoldingEnabled(true);
+		ToolTipManager.sharedInstance().registerComponent(textArea);
+		return textArea;
+	}
+
+	/**
 	 * Toggles whether the completion window uses "fancy" rendering.
 	 */
 	private class FancyCellRenderingAction extends AbstractAction {
@@ -572,6 +567,18 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 	}
 
+	private void showNoConfigError() {
+		// TODO
+		JOptionPane.showMessageDialog(this,
+				"Can\'t find your config file. Have you added it in your properties?", "No config-file error",
+				JOptionPane.WARNING_MESSAGE);
+		// ProjectDialog dialog = new ProjectDialog(
+		// (ThingMLApp) SwingUtilities.getWindowAncestor(this),
+		// getCurrentProperties());
+		// dialog.setLocationRelativeTo(this);
+		// dialog.setVisible(true);
+	}
+
 	public void hyperlinkUpdate(HyperlinkEvent e) {
 		if (e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
 			URL url = e.getURL();
@@ -584,6 +591,47 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		}
 	}
 
+	public void compileAndRunArduino() {
+		if (getTabTitle().equals("Untitle") || getTabTitle().equals("Untitle*")) {
+			setStatusLineMessage("Missing config file. Save and add config file in properties.");
+			showNoConfigError();
+			return;
+		}
+		saveFile();
+
+		ThingmlResource resource = getThingmlResource();
+		if (resource == null) {
+			showNoConfigError();
+			return;
+		}
+
+		// TODO: Save when compiling, and report when there are errors and ask
+		// if the want to compile or fix errors
+		// I also need to check for missing config
+
+		ThingMLModel model = (ThingMLModel) resource.getContents().get(0);
+
+		CGenerator.compileAndRunArduino(model, getArduinoPath(),
+				getArduinoPath() + "/lib");
+	}
+
+	public void uninstallSourceTree() {
+		tree.uninstall();
+		tree = null;
+	}
+
+	public void purgeStatusLine() {
+		if (cursorLabel == null)
+			return;
+		int result = cursorLabel.getText().indexOf("--");
+		if (result == -1)
+			cursorLabel.setText(cursorLabel.getText() + "-- "
+					+ getStatusLineMessage());
+		else
+			cursorLabel.setText(cursorLabel.getText().substring(0, result)
+					+ "-- " + getStatusLineMessage());
+	}
+
 	public ThingmlResource getThingmlResource() {
 
 		// Register the generated package and the XMI Factory
@@ -594,8 +642,13 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 		// Load the model
 		ResourceSet rs = new ResourceSetImpl();
-
-		if (getConfigFilePath() == null) {
+		if (getTabTitle().equals("Untitle") || getTabTitle().equals("Untitle*")) {
+			// TODO: User has probably just started a file, no need to save, so
+			// just
+			// return a null. Should be switched out with a temporarily save
+			// file.
+			return null;
+		} else if (getConfigFilePath() == null) {
 			JFileChooser chooser = new JFileChooser(
 					"./src/main/resources/samples");
 			chooser.setFileFilter(new ExtensionFileFilter(
@@ -633,23 +686,6 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		assert (resource.getContents().get(0) instanceof ThingMLModel);
 
 		return (ThingmlResource) resource;
-	}
-
-	public void compileAndRunArduino() {
-		saveFile();
-		// TODO: Save when compiling, and report when there are errors and ask
-		// if the want to compile or fix errors
-		// I also need to check for missing config
-		ThingmlResource resource = getThingmlResource();
-		ThingMLModel model = (ThingMLModel) resource.getContents().get(0);
-
-		CGenerator.compileAndRunArduino(model, getArduinoPath(),
-		getArduinoPath() + "/lib");
-	}
-
-	public void uninstallSourceTree() {
-		tree.uninstall();
-		tree = null;
 	}
 
 	public String getFilePath(int index) {
@@ -695,9 +731,32 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 	public Thread getLastThread() {
 		return threadList.get(threadList.size() - 1);
 	}
-	
+
 	public int getCaretPosition() {
 		return getCurrentTextArea().getCaretPosition();
+	}
+
+	public String getStatusLineMessage() {
+		return statusLineMessage;
+	}
+
+	public RSyntaxTextArea getCurrentTextArea() {
+		return textAreas.get(getSelectedTabIndex());
+	}
+
+	public void setCurrentTextArea(RSyntaxTextArea rSyntaxTextArea) {
+		// currentTextArea = null;// rSyntaxTextArea;
+	}
+
+	private void setStatusline(int line, int offset) {
+		if (cursorLabel != null)
+			cursorLabel.setText("Char: " + offset + " -- "
+					+ getStatusLineMessage());
+	}
+
+	public void setStatusLineMessage(String message) {
+		statusLineMessage = message;
+		purgeStatusLine();
 	}
 
 	public void setPropertiesPath(String propertiesPath) {
@@ -732,6 +791,12 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 
 	public void addPane(RTextArea rTextArea) {
 		addPane("", rTextArea);
+	}
+
+	private void addItem(Action a, ButtonGroup bg, JMenu menu) {
+		JRadioButtonMenuItem item = new JRadioButtonMenuItem(a);
+		bg.add(item);
+		menu.add(item);
 	}
 
 	public void addPane(String title, RTextArea rTextArea) {
@@ -976,20 +1041,5 @@ public class ThingMLRootPane extends JRootPane implements HyperlinkListener,
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public void keyPressed(KeyEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 }
