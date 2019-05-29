@@ -75,7 +75,7 @@
                         <phase>validate</phase>
                         <configuration>
                             <tasks>
-                                <copy todir="src/test/resources/thingml"  preservelastmodified="true">
+                                <copy todir="src/test/resources/thingml" preservelastmodified="true">
                                     <fileset dir="../org.thingml.samples/src/main/thingml"/>
                                 </copy>
                             </tasks>
@@ -96,7 +96,7 @@
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-embedder</artifactId>
-            <version>3.0.4</version>
+            <version>3.5.0</version>
         </dependency>        
 
         <dependency>
